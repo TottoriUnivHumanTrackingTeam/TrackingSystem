@@ -87,7 +87,7 @@ function mouseDragged() {
                 $('[name="detectorGrid.y"]').val([detector.detectorGrid.y]);
                 break;
             }
-        }
+        } 
     }
     // Prevent default functionality.
     return false;

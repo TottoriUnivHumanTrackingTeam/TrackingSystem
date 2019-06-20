@@ -129,9 +129,17 @@ module.exports = class APIHandlers {
     }
 
     static getMap(req, res) {
-        MapRepository.getMap()
+        MapRepository.getAllMap()
             .then((map) => {
                 res.send(map);
+            });
+    }
+
+    static deleteMap(req, res) {
+        const mapId = req.body.mapName;
+        MapRepository.removeMap(mapId)
+            .then(() => {
+                res.send('Successfully delete map!');
             });
     }
 };

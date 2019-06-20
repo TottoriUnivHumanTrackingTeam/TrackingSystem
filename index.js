@@ -27,6 +27,10 @@ app.get('/userDashBoard', (request, response) => {
 app.get('/mapconfig', (request, response) => {
     response.sendFile(__dirname + '/ui/config/mapconfig.html');
 });
+
+app.get('/mapsetting', (request, response) => {
+    response.sendFile(__dirname + '/ui/map-setting/mapsetting.html');
+});
 //DetectionData
 app.post('/api/detectionData', (request, response) => {
     APIHandler.addDetectionData(request, response)
@@ -77,6 +81,10 @@ app.post('/api/map', (request, response) => {
 
 app.get('/api/map', (request, response) => {
     APIHandler.getMap(request, response)
+});
+
+app.delete('/api/map', (request, response) => {
+    APIHandler.deleteMap(request, response)
 });
 
 //TrackingManagement
