@@ -36,8 +36,6 @@ function draw() {
     if (maps.length > 0) {
         for (let map of maps) {
 			fill(0, 50);
-			ellipse(map.size.min.x, map.size.min.y, radius, radius);
-			ellipse(map.size.max.x, map.size.max.y, radius, radius);
 			quad(map.size.min.x, map.size.min.y, map.size.max.x, map.size.min.y, 
 				map.size.max.x, map.size.max.y, map.size.min.x, map.size.max.y);
             if(map.active) {
@@ -50,8 +48,11 @@ function draw() {
 }
 
 function mousePressed() {
-	maps.push({ name: 'new', size: {min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}, color:'#ff8c00', active: false });
-    return false;
+	let y = mouseY;
+	if(y < height){
+		maps.push({ name: 'new', size: {min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}, color:'#ff8c00', active: false });
+		return false;
+	}
 }
 
 function mouseReleased(){
@@ -60,7 +61,7 @@ function mouseReleased(){
 	if(map.name === 'new'){
 		$('[name="name"]').prop('disabled', false);
 	}else{
-		$('[name="name"]').prop('disabled', true);
+		$('[name="name"]').prop('disabled', true); 
 	}
     return false;
 }
