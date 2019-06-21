@@ -51,6 +51,7 @@ function mousePressed() {
 	let y = mouseY;
 	if(y < height){
 		maps.push({ name: 'new', size: {min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}, color:'#ff8c00', active: false });
+		$('[name="name"]').val([map.name]);
 		return false;
 	}
 }
@@ -89,8 +90,11 @@ function doubleClicked() {
 }
 
 function mouseDragged() {
+	let y = mouseY;
+	if(y < height){
 	let map = maps.find(map => map.name === 'new');
 	map.size.max = { x: mouseX, y: mouseY };
+	}
 }
 
 const mapSubmit = function mapSubmit() {
