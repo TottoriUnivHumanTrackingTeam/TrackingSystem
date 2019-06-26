@@ -49,6 +49,13 @@ function draw() {
         	}
     	}
 	}
+	if (maps_hozon.length > 0) {
+		for(i = 0; maps_hozon[0].size.length > i; i++ ){
+			fill(0, 50);
+			quad(maps_hozon[0].size[i].min.x, maps_hozon[0].size[i].min.y, maps_hozon[0].size[i].max.x, maps_hozon[0].size[i].min.y, 
+				maps_hozon[0].size[i].max.x, maps_hozon[0].size[i].max.y, maps_hozon[0].size[i].min.x, maps_hozon[0].size[i].max.y);
+	}
+	}
 }
 
 function mousePressed() {
@@ -57,14 +64,10 @@ function mousePressed() {
 	if(y < height){
 		if(!map){
 			maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
-			console.log("初回プレス");
-			console.log(map);
 		}else{
 			maps.pop();
 			maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
 			$('[name="name"]').val([map.name]);
-			console.log("2回目プレス");
-			console.log(map);
 		}
 		return false;
 	}
@@ -74,30 +77,28 @@ function mouseReleased(){
 	let y = mouseY;
 	let map = maps.find(map => map.name === 'new');
 	if(y < height){	
-		
 		if(maps_hozon.length == 0){
-			maps_hozon.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
-			console.log("初回リリース");
-			console.log(maps_hozon);
-			console.log(maps_hozon[0].size);
+			maps_hozon.push({ name: 'new', size: [{min: {x: map.size[0].min.x, y: map.size[0].min.y}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
 		}else{
 			maps_hozon[0].size.push(map.size[0]);
-			console.log("２回目リリース");
-			console.log(maps_hozon);
-			console.log(maps_hozon[0].size);
+			for(i = 0; maps_hozon[0].size.length > i; i++){
+				map.size[i] = maps_hozon[0].size[i];
+			}
+			
 		}
-	if(map.name === 'new'){
-		$('[name="name"]').prop('disabled', false);
-	}else{
-		$('[name="name"]').prop('disabled', true); 
-	}
-	return false;
+		if(map.name === 'new'){
+			$('[name="name"]').prop('disabled', false);
+		}else{
+			$('[name="name"]').prop('disabled', true); 
+		}
+		return false;
 	}	
 }
 
 function doubleClicked() {
 	if (maps.length > 0) {
 		for (let map of maps) {
+	
 			distance = dist(mouseX, mouseY, map.size.min.x, map.y);
 			if (distance < radius) {
 				map.active = true;
@@ -145,7 +146,6 @@ const mapSubmit = function mapSubmit() {
 			contentType: "application/json; charset=utf-8"
 		});
 	}
-	console.log(map);
 }
 
 const mapDelete = function mapDelete() {
