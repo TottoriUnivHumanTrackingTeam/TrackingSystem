@@ -41,11 +41,11 @@ function draw() {
 				quad(map.size[i].min.x, map.size[i].min.y, map.size[i].max.x, map.size[i].min.y, 
 					map.size[i].max.x, map.size[i].max.y, map.size[i].min.x, map.size[i].max.y);
 		
-            if(map.active) {
-            	textSize(10);
-				text(`mapName: ${map.mapName} `, map.size.min.x+radius+5, map.size.min.y);
-            	fill('#000000');
-            }
+            	if(map.active) {
+            		textSize(10);
+					text(`mapName: ${map.mapName} `, map.size.min.x+radius+5, map.size.min.y);
+            		fill('#000000');
+            	}
         	}
     	}
 	}
@@ -53,23 +53,46 @@ function draw() {
 
 function mousePressed() {
 	let y = mouseY;
+	let map = maps.find(map => map.name === 'new');
 	if(y < height){
-		maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
-		$('[name="name"]').val([map.name]);
+		if(!map){
+			maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
+			console.log("初回プレス");
+			console.log(map);
+		}else{
+			maps.pop();
+			maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
+			$('[name="name"]').val([map.name]);
+			console.log("2回目プレス");
+			console.log(map);
+		}
 		return false;
 	}
 }
 
 function mouseReleased(){
+	let y = mouseY;
 	let map = maps.find(map => map.name === 'new');
-	maps_hozon = map;
-	console.log(maps_hozon);
+	if(y < height){	
+		
+		if(maps_hozon.length == 0){
+			maps_hozon.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
+			console.log("初回リリース");
+			console.log(maps_hozon);
+			console.log(maps_hozon[0].size);
+		}else{
+			maps_hozon[0].size.push(map.size[0]);
+			console.log("２回目リリース");
+			console.log(maps_hozon);
+			console.log(maps_hozon[0].size);
+		}
 	if(map.name === 'new'){
 		$('[name="name"]').prop('disabled', false);
 	}else{
 		$('[name="name"]').prop('disabled', true); 
 	}
 	return false;
+	}	
 }
 
 function doubleClicked() {
@@ -91,14 +114,14 @@ function doubleClicked() {
 			}
 		}
 	}
-  return false;
+  	return false;
 }
 
 function mouseDragged() {
 	let y = mouseY;
 	if(y < height){
-	let map = maps.find(map => map.name === 'new');
-	map.size[0].max = { x: mouseX, y: mouseY };
+		let map = maps.find(map => map.name === 'new');
+		map.size[0].max = { x: mouseX, y: mouseY };
 	}
 }
 
