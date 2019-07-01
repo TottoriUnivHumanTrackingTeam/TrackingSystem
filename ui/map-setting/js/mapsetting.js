@@ -1,5 +1,4 @@
 let bg;
-let radius = 8;
 let maps = [];
 let originalMaps = [];
 let maps_hozon = [];
@@ -21,7 +20,6 @@ function setup() {
 			originalMaps = data;
 			maps = originalMaps.concat();
 			for(let map of maps) {
-				map.color = '#ff8c00';
 				map.active = false;
 			}
 		}
@@ -37,24 +35,26 @@ function draw() {
     if (maps.length > 0) {
 		for(let map of maps) {
 			for(i = 0; map.size.length > i; i++ ){
-				fill(0, 50);
+				fill(0,50);
 				quad(map.size[i].min.x, map.size[i].min.y, map.size[i].max.x, map.size[i].min.y, 
 					map.size[i].max.x, map.size[i].max.y, map.size[i].min.x, map.size[i].max.y);
-		
-            	if(map.active) {
-            		textSize(10);
-					text(`mapName: ${map.mapName} `, map.size.min.x+radius+5, map.size.min.y);
-            		fill('#000000');
-            	}
-        	}
+			}
+			
+			if(map.active) {
+				for(i = 0; map.size.length > i; i++ ){
+					fill('rgba(255,150,0,0.5)');
+					quad(map.size[i].min.x, map.size[i].min.y, map.size[i].max.x, map.size[i].min.y, 
+						map.size[i].max.x, map.size[i].max.y, map.size[i].min.x, map.size[i].max.y);
+				}
+			}
     	}
 	}
 	if (maps_hozon.length > 0) {
 		for(i = 0; maps_hozon[0].size.length > i; i++ ){
-			fill(0, 50);
+			fill('rgba(255,0,0, 0.25)');
 			quad(maps_hozon[0].size[i].min.x, maps_hozon[0].size[i].min.y, maps_hozon[0].size[i].max.x, maps_hozon[0].size[i].min.y, 
 				maps_hozon[0].size[i].max.x, maps_hozon[0].size[i].max.y, maps_hozon[0].size[i].min.x, maps_hozon[0].size[i].max.y);
-	}
+		}
 	}
 }
 
@@ -67,7 +67,6 @@ function mousePressed() {
 		}else{
 			maps.pop();
 			maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
-			$('[name="name"]').val([map.name]);
 		}
 		return false;
 	}
@@ -84,7 +83,6 @@ function mouseReleased(){
 			for(i = 0; maps_hozon[0].size.length > i; i++){
 				map.size[i] = maps_hozon[0].size[i];
 			}
-			
 		}
 		if(map.name === 'new'){
 			$('[name="name"]').prop('disabled', false);
@@ -98,24 +96,19 @@ function mouseReleased(){
 function doubleClicked() {
 	if (maps.length > 0) {
 		for (let map of maps) {
-	
-			distance = dist(mouseX, mouseY, map.size.min.x, map.y);
-			if (distance < radius) {
-				map.active = true;
-				map.color = '#f00';
-				$('[name="name"]').val([map.name]);
-				if(map.name === 'new'){
-					$('[name="name"]').prop('disabled', false);
-				}else{
-					$('[name="name"]').prop('disabled', true);
+			for(i = 0; map.size.length > i; i++){
+				if(map.size[i].max.x - mouseX > 0 && mouseX - map.size[i].min.x > 0 &&
+					map.size[i].max.y - mouseY > 0 && mouseY - map.size[i].min.y > 0){
+					$('[name="name"]').val([map.name]);
+					map.active = true;
+					break;
+				} else {
+					map.active = false;
 				}
-			} else {
-				map.active = false;
-				map.color = '#ff8c00';
 			}
 		}
+	  return false;
 	}
-  	return false;
 }
 
 function mouseDragged() {
