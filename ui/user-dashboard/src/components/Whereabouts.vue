@@ -54,7 +54,7 @@ export default {
               xAxes: [{
                   ticks: {
                       autoSkip: true,
-                      maxTicksLimit: 10 //’l‚ÌÅ‘å•\¦”
+                      maxTicksLimit: 10 //å€¤ã®æœ€å¤§è¡¨ç¤ºæ•°
                  }
               }]
          }

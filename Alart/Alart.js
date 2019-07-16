@@ -18,7 +18,7 @@ module.exports = class Alart {
             const keepOutResult = KeepOut.check(tracker);
 
             if (lostResult || keepOutResult) {
-                const message = lostResult + '</br>' + keepOutResult + '</br></br><a href="http://192.168.235.135:3000">Web‚ÅŠm”F‚·‚é</a>';
+                const message = lostResult + '</br>' + keepOutResult + '</br></br><a href="http://192.168.235.135:3000">Webã§ç¢ºèªã™ã‚‹</a>';
                 this.sendMail(tracker, message);
             }else{
                 TrackerRepository.updateTracker(tracker.trackerID, tracker);
