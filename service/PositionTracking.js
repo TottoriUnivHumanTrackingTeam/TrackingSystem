@@ -100,4 +100,3 @@ module.exports = class PositionTracking {
         allMaps.forEach((map) => { if(isContain(map)) { return map.name }});
     }
 }
-    
