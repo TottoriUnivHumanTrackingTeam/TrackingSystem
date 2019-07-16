@@ -46,14 +46,14 @@ function draw() {
                 textSize(20);
                 textAlign(LEFT, TOP);
                 fill(color('red'));
-                text(tracker.trackerName + "ã•ã‚“ãŒç«‹å…¥ç¦æ­¢åŒºåŸŸã«ä¾µå…¥ã—ã¦ã„ã¾ã™ï¼",
+                text(tracker.trackerName + "‚³‚ñ‚ª—§“ü‹Ö~‹æˆæ‚ÉN“ü‚µ‚Ä‚¢‚Ü‚·I",
                     tracker.Location.grid.x + 30, tracker.Location.grid.y + 30);
                 image(alartTrackedPeople, tracker.Location.grid.x, tracker.Location.grid.y);
             }else if(tracker.alart.lost) {
                 textSize(20);
                 textAlign(LEFT, TOP);
                 fill(color('red'));
-                text(tracker.trackerName + "ã•ã‚“ã‚’è¦‹å¤±ã„ã¾ã—ãŸï¼",
+                text(tracker.trackerName + "‚³‚ñ‚ğŒ©¸‚¢‚Ü‚µ‚½I",
                     tracker.Location.grid.x + 30, tracker.Location.grid.y + 30);
                 image(alartTrackedPeople, tracker.Location.grid.x, tracker.Location.grid.y);
             }else{

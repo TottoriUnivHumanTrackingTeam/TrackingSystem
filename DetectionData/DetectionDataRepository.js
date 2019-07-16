@@ -1,6 +1,6 @@
 'use strict';
 
-//detecterからのデータなので基本的に削除, 変更はしない
+//detecter����̃f�[�^�Ȃ̂Ŋ�{�I�ɍ폜, �ύX�͂��Ȃ�
 const fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
 const DetectionData = require('./DetectionData');

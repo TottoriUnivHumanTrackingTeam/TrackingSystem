@@ -105,7 +105,7 @@ const detectorSubmit = function detectorSubmit() {
 		detector.detectorGrid.x = Number(detectorGrid_x);
 		detector.detectorGrid.y = Number(detectorGrid_y);
 		detector.detectorMap = detectorMap;
-
+		console.log(detector);
 		$.ajax({
 			url:'http://localhost:3000/api/detector/',
 			type:'POST',
@@ -126,10 +126,11 @@ const detectorSubmit = function detectorSubmit() {
 }
 
 const detectorDelete = function detectorDelete() {
-	const detectorNumber = $('[name="detectorNumber"]').val();
+	const detectorNumber = Number($('[name="detectorNumber"]').val());
 	if(detectorNumber) {
 		const num = detectors.findIndex(detector => detector.detectorNumber === detectorNumber);
 		detectors.splice( num, 1 );
+		console.log(detectors)
 		$.ajax({
 			url:'http://localhost:3000/api/detector',
 			type:'DELETE',
