@@ -1,6 +1,6 @@
 'use strict';
 
-//detecter����̃f�[�^�Ȃ̂Ŋ�{�I�ɍ폜, �ύX�͂��Ȃ�
+//detecterからのデータなので基本的に削除、変更はしない
 const fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
 const Location = require('./Location');
