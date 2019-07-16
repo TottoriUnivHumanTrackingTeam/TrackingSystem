@@ -46,7 +46,7 @@ function draw() {
                 textSize(20);
                 textAlign(LEFT, TOP);
                 fill(color('red'));
-                text(tracker.trackerName + "さんが立ち入り禁止区域に侵入しています！",
+                text(tracker.trackerName + "さんが立入禁止区域に侵入しています！",
                     tracker.Location.grid.x + 30, tracker.Location.grid.y + 30);
                 image(alartTrackedPeople, tracker.Location.grid.x, tracker.Location.grid.y);
             }else if(tracker.alart.lost) {

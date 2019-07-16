@@ -1,6 +1,6 @@
 'use strict';
 
-//detecterからのデータなので基本的に削除、変更はしない
+//detecterからのデータなので基本的に削除,変更はしない
 const fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
 const DetectionData = require('./DetectionData');
