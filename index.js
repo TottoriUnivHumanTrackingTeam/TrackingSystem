@@ -24,8 +24,8 @@ app.get('/userDashBoard', (request, response) => {
     response.sendFile(__dirname + '/ui/dist/index.html');
 });
 
-app.get('/mapconfig', (request, response) => {
-    response.sendFile(__dirname + '/ui/config/mapconfig.html');
+app.get('/detectorsetting', (request, response) => {
+    response.sendFile(__dirname + '/ui/detector-setting/detector-setting.html');
 });
 
 app.get('/mapsetting', (request, response) => {

@@ -94,7 +94,7 @@ function mouseDragged() {
 }
 
 const detectorSubmit = function detectorSubmit() {
-	const detectorNumber = $('[name="detectorNumber"]').val();
+	const detectorNumber = Number($('[name="detectorNumber"]').val());
 	const detectorGrid_x = $('[name="detectorGrid.x"]').val();
 	const detectorGrid_y = $('[name="detectorGrid.y"]').val();
 	const detectorMap = $('[name="detectorMap"]').val();
