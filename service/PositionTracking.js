@@ -99,9 +99,4 @@ module.exports = class PositionTracking {
         const allMaps = await MapRepository.getAllMap();
         allMaps.forEach((map) => { if(isContain(map)) { return map.name }});
     }
-<<<<<<< HEAD
 };
-=======
-}
-    
->>>>>>> testt
