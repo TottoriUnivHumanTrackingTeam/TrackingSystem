@@ -25,8 +25,18 @@ function setup() {
 		}
 	});
 	ellipseMode(RADIUS);
-	$(".submit").click(mapSubmit);
-	$(".delete").click(mapDelete);
+
+	$(".text").bind("keydown keyup keypress change",function(){
+		if ($('.text').val().length > 0) {
+			$('.submit').prop('disabled', false);
+		}else{
+			$('.submit').prop('disabled', true);
+		}
+
+	});
+
+	$(".submit").on('click', mapSubmit);
+	$(".delete").on('click',mapDelete);
 }
 
 function draw() {
@@ -75,6 +85,7 @@ function mousePressed() {
 function mouseReleased(){
 	let y = mouseY;
 	let map = maps.find(map => map.name === 'new');
+	
 	if(y < height){	
 		if(maps_hozon.length == 0){
 			maps_hozon.push({ name: 'new', size: [{min: {x: map.size[0].min.x, y: map.size[0].min.y}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
@@ -127,17 +138,17 @@ const mapSubmit = function mapSubmit() {
 		mapSize[i] = map1.size[i] 
 	}
 	let map = maps.find(map => map.name === mapName);
-	if(!map) {
+	if(!map) { 
 		map = maps.find(map => map.name === 'new');
 		map.name = mapName;
 		map.size = mapSize;
-
 		$.ajax({
 			url:'http://localhost:3000/api/map/',
 			type:'POST',
 			data: JSON.stringify(map),
 			contentType: "application/json; charset=utf-8"
 		});
+		window.location.reload();
 	}
 }
 
@@ -153,4 +164,5 @@ const mapDelete = function mapDelete() {
 			contentType: "application/json; charset=utf-8"
 		});
 	}
+	window.location.reload();
 }

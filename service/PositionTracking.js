@@ -90,14 +90,18 @@ module.exports = class PositionTracking {
     }
 
     static async estimationMap(grid) {
-        const allMaps = await MapRepository.getAllMap();
-        for(let map of allMaps){
-            if(grid.x > map.size.min.x && grid.x < map.size.max.x) {
-                if(grid.y > map.size.min.y && grid.y < map.size.max.y) {
-                    return map.name;
-                }
-            }
+        const isContain = (map) => {
+            const m = _.find(map.size, function(size){ return grid.x > size.min.x && grid.x < size.max.x &&
+                                                              grid.y > size.min.y && grid.y < size.max.y});
+            if(m) { return true; }
+            else { return false; }
         }
-        return null;
+        const allMaps = await MapRepository.getAllMap();
+        allMaps.forEach((map) => { if(isContain(map)) { return map.name }});
     }
+<<<<<<< HEAD
 };
+=======
+}
+    
+>>>>>>> testt

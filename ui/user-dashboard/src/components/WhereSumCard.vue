@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-card title="æ‰€åœ¨åˆ†å¸ƒ" style="width: 90%; " class="mb-2">
+        <b-card title="ŠÝ•ª•z" style="width: 90%; " class="mb-2">
              <WhereSum v-bind:info="data" :height="300" />
         </b-card>
     </div>
