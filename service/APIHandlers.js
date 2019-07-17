@@ -6,15 +6,22 @@ const TrackerRepository = require('../Tracker/TrackerRepository');
 const DetectorRepository = require('../Detector/DetectorRepository');
 const MapRepository = require('../Map/MapRepository');
 const Alart = require('../Alart/Alart');
-let timerID;
+
+let timerID = 0;
+let dataAddID = 0;
+const detectionDataBuffer = [];
 
 module.exports = class APIHandlers {
     static addDetectionData(req, res) {
         const detectionData = req.body;
-        DetectionDataRepository.addDetectionData(detectionData)
-            .then(() => {
-                res.send("DetectionData Add Success!");
-            });
+        detectionDataBuffer.push(detectionData);
+        res.send("DetectionData Add Success!");
+        if(!dataAddID) {
+            dataAddID = setInterval(() => {
+                DetectionDataRepository.addDetectionData(detectionDataBuffer)
+                    .then( () => detectionDataBuffer.length = 0 );
+            }, 3000);
+        }
     }
 
     static addTracker(req, res) {
@@ -93,7 +100,7 @@ module.exports = class APIHandlers {
     static startPositionTracking(req, res) {
         timerID = setInterval(() => {
             const date = new Date();
-            const startTime = date.getTime()-1000;
+            const startTime = date.getTime()-5000;
             PositionTracking.updateLocations(startTime);
             Alart.check();
         }, 1000);

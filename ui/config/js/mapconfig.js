@@ -16,7 +16,7 @@ function setup() {
 		url:'http://localhost:3000/api/detector',
 		type:'GET'
 	}).done( (data) => {
-		if(data) { 
+		if(data) {
 			originalDetectors = data;
 			detectors = originalDetectors.concat();
 			for(let detector of detectors) {

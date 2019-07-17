@@ -19,15 +19,10 @@ export default {
   },
   methods: {
     makeList: function(){
-      const arraySize = this.info.Location.length-1;
-      const limitTime = this.info.Location[arraySize].locatedTime - 3600000;
-
-      for(let i = arraySize; this.info.Location[i].locatedTime >= limitTime; i -- ){
-        this.placeList.push(this.info.Location[i].map)
-        this.timeList.push(moment(this.info.Location[i].locatedTime).format('YYYY/MM/DD HH:mm:ss'))
+      for(let location of this.info.Location){
+        this.placeList.push(String(location.map))
+        this.timeList.push(moment(location.locatedTime).format('YYYY/MM/DD HH:mm:ss'))
       }
-      this.placeList.reverse()
-      this.timeList.reverse()
     },
     renderCharts: function(){
       this.renderChart({
@@ -49,7 +44,7 @@ export default {
          scales: {
               yAxes: [{
                   type: 'category',
-                  labels: this.placeList.filter(function (x, i, self) { return self.indexOf(x) == i;})
+                  labels: ["3809", "3810", "Corridor1", "Corridor2", "Corridor3", "Corridor4", "Corridor5", "3802"].reverse()
               }],
               xAxes: [{
                   ticks: {
