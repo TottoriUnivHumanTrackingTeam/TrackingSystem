@@ -2,6 +2,8 @@ let bg;
 let maps = [];
 let originalMaps = [];
 let maps_hozon = [];
+let metas = [];
+let originalMetas = [];
 let width = 1020;
 let height = 645;
 
@@ -24,6 +26,19 @@ function setup() {
 			}
 		}
 	});
+
+	$.ajax({
+		url:'http://localhost:3000/api/meta',
+		type:'GET'
+	}).done( (data2) => {
+		if(data2) { 
+			originalMetas = data2;
+			metas = originalMetas.concat();
+			for(let meta of metas) {
+				meta.active = false;
+			}
+		}
+	});
 	ellipseMode(RADIUS);
 
 	$(".text").bind("keydown keyup keypress change",function(){
@@ -32,7 +47,6 @@ function setup() {
 		}else{
 			$('.submit').prop('disabled', true);
 		}
-
 	});
 
 	$(".submit").on('click', mapSubmit);
@@ -41,18 +55,27 @@ function setup() {
 
 function draw() {
     clear();
-    if(bg) image(bg, 0, 0, width, height);
+	if(bg) image(bg, 0, 0, width, height);
+	if (metas.length > 0) {
+		for(let meta of metas) {
+			for(i = 0; meta.size.length > i; i++ ){
+				fill(0,30);
+				quad(meta.size[i].min.x, meta.size[i].min.y, meta.size[i].max.x, meta.size[i].min.y, 
+					meta.size[i].max.x, meta.size[i].max.y, meta.size[i].min.x, meta.size[i].max.y);
+            }
+        }
+    }
     if (maps.length > 0) {
 		for(let map of maps) {
 			for(i = 0; map.size.length > i; i++ ){
-				fill(0,50);
+				fill('rgba(255,150,0,0.5)');
 				quad(map.size[i].min.x, map.size[i].min.y, map.size[i].max.x, map.size[i].min.y, 
 					map.size[i].max.x, map.size[i].max.y, map.size[i].min.x, map.size[i].max.y);
 			}
 			
 			if(map.active) {
 				for(i = 0; map.size.length > i; i++ ){
-					fill('rgba(255,150,0,0.5)');
+					fill('rgba(255,150,0,0.9)');
 					quad(map.size[i].min.x, map.size[i].min.y, map.size[i].max.x, map.size[i].min.y, 
 						map.size[i].max.x, map.size[i].max.y, map.size[i].min.x, map.size[i].max.y);
 				}
@@ -73,10 +96,31 @@ function mousePressed() {
 	let map = maps.find(map => map.name === 'new');
 	if(y < height){
 		if(!map){
-			maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
+			for (let meta of metas) {
+				for(i = 0; meta.size.length > i; i++){
+					if(meta.size[i].max.x - mouseX > 0 && mouseX - meta.size[i].min.x > 0 &&
+						meta.size[i].max.y - mouseY > 0 && mouseY - meta.size[i].min.y > 0){
+						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: meta.name });
+						break;
+					} else {
+						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: null});
+					}
+				}
+			}
 		}else{
 			maps.pop();
-			maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], color:'#ff8c00', active: false });
+			
+			for (let meta of metas) {
+				for(i = 0; meta.size.length > i; i++){
+					if(meta.size[i].max.x - mouseX > 0 && mouseX - meta.size[i].min.x > 0 &&
+						meta.size[i].max.y - mouseY > 0 && mouseY - meta.size[i].min.y > 0){
+						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: meta.name });
+						break;
+					} else {
+						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: null});
+					}
+				}
+			}
 		}
 		return false;
 	}
@@ -134,21 +178,38 @@ const mapSubmit = function mapSubmit() {
 	let map1 = maps.find(map => map.name === 'new');
 	const mapName = $('[name="name"]').val();
 	const mapSize = []
+	const metaName = map1.mname
 	for(i = 0; map1.size.length > i; i++ ){
 		mapSize[i] = map1.size[i] 
 	}
 	let map = maps.find(map => map.name === mapName);
+	let meta = metas.find(meta => meta.name ===metaName);
 	if(!map) { 
 		map = maps.find(map => map.name === 'new');
 		map.name = mapName;
 		map.size = mapSize;
+		map.mname = metaName;
 		$.ajax({
 			url:'http://localhost:3000/api/map/',
 			type:'POST',
 			data: JSON.stringify(map),
 			contentType: "application/json; charset=utf-8"
-		});
-		window.location.reload();
+		})
+		.then((map) => {
+				console.log(map)
+				meta.mapName = map.mName
+				meta.mapID = map.mapID;
+				$.ajax({
+				url:'http://localhost:3000/api/meta',
+				type:'PUT',
+				data: JSON.stringify(meta),
+				contentType: "application/json; charset=utf-8"
+				})
+				console.log(meta.name)
+		}
+		
+		);
+		//window.location.reload();
 	}
 }
 
@@ -156,7 +217,6 @@ const mapDelete = function mapDelete() {
 	const mapName = $('[name="name"]').val();
 	if(mapName) {
 		const num = maps.findIndex(map => map.name === mapName);
-		maps.splice( num, 1 );
 		$.ajax({
 			url:'http://localhost:3000/api/map',
 			type:'DELETE',

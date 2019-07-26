@@ -60,4 +60,17 @@ module.exports = class MetaRepository {
         }
         return metas;
     }
+
+    static async updateMeta(metaData) {
+        const client = await MongoClient.connect(DBURL)
+        .catch((err) => {
+          console.log(err);
+        });
+        const db = client.db(DBName);
+        const mName = metaData.name;
+        const mapID = metaData.mapID;
+        const res = await db.collection('meta').update({name:mName},{$push:{"mapIDList":mapID}});
+        client.close();
+        return res.result;
+    }
 };

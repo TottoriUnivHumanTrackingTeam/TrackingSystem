@@ -5,6 +5,7 @@ const DetectionDataRepository = require('../DetectionData/DetectionDataRepositor
 const TrackerRepository = require('../Tracker/TrackerRepository');
 const DetectorRepository = require('../Detector/DetectorRepository');
 const MapRepository = require('../Map/MapRepository');
+const MetaRepository = require('../Meta/MetaRepository');
 const Alart = require('../Alart/Alart');
 let timerID;
 
@@ -45,8 +46,8 @@ module.exports = class APIHandlers {
     static addMap(req, res) {
         const map = req.body;
         MapRepository.addMap(map)
-            .then(() => {
-                res.send("Map Add Success!");
+            .then((map) => {
+                res.json(map);
             });
     }
 
@@ -140,6 +141,37 @@ module.exports = class APIHandlers {
         MapRepository.removeMap(mapId)
             .then(() => {
                 res.send('Successfully delete map!');
+            });
+    }
+
+    static addMeta(req, res) {
+        const meta = req.body;
+        MetaRepository.addMeta(meta)
+            .then(() => {
+                res.send("Meta Add Success!");
+            });
+    }
+
+    static getMeta(req, res) {
+        MetaRepository.getAllMeta()
+            .then((meta) => {
+                res.send(meta);
+            });
+    }
+
+    static deleteMeta(req, res) {
+        const metaId = req.body.metaName;
+        MetaRepository.removeMeta(metaId)
+            .then(() => {
+                res.send('Successfully delete meta!');
+            });
+    }
+
+    static putMeta(req, res) {
+        const meta = req.body;
+        MetaRepository.updateMeta(meta)
+            .then(() => {
+                res.send('Successfully put meta!');
             });
     }
 };

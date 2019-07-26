@@ -11,16 +11,17 @@ const DBURL = config.DB.URL + '/' + DBName;
 
 module.exports = class MapRepository {
     static async addMap(mapData) {
-        const map = new Map(mapData["name"], mapData["size"]);
+        const newMap = new Map(mapData["name"], mapData["size"], mapData["mname"]);
 
         const client = await MongoClient.connect(DBURL)
             .catch((err) => {
                 console.log(err);
             });
         const db = client.db(DBName);
-        const res = await db.collection('map').insert(map);
+        const res = await db.collection('map').insert(newMap);
+        const map = await db.collection('map').findOne({name: newMap.name});
         client.close();
-        return res.result;
+        return map;
     }
 
     static async removeMap(searchedMapName) {
