@@ -196,7 +196,7 @@ const mapSubmit = function mapSubmit() {
 			contentType: "application/json; charset=utf-8"
 		})
 		.then((map) => {
-				console.log(map)
+			if(meta){
 				meta.mapName = map.mName
 				meta.mapID = map.mapID;
 				$.ajax({
@@ -205,11 +205,13 @@ const mapSubmit = function mapSubmit() {
 				data: JSON.stringify(meta),
 				contentType: "application/json; charset=utf-8"
 				})
-				console.log(meta.name)
-		}
-		
-		);
-		//window.location.reload();
+				window.location.reload();
+			}else{
+				window.location.reload();
+			}
+		},() => {
+			alert("マップが登録されませんでした。")
+		});
 	}
 }
 
