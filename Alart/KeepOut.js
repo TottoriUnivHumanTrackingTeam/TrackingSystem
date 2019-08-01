@@ -12,21 +12,21 @@ module.exports = class KeepOut {
         
         let map1 = allMaps.find(map => map.mapID === tracker.Location.map);
 
-        const inMeta = (map) => {
+        const includedMeta = (map) => {
             if(map.meta == map1.mname){
                 return true;
             }else{
                 return false;
             }
         }
-        const inPlace = (map) => {
+        const includedPlace = (map) => {
             if(map.name == map1.name){
                 return true;
             }else{
                 return false;
             }
         }
-        const inMetaPlace = (map) => {
+        const includedMetaPlace = (map) => {
             if(map.meta == map1.mname && map.name == map1.name){
                 return true;
             }else{
@@ -36,21 +36,33 @@ module.exports = class KeepOut {
 
         for(let map of keepOutList['map']){
             if(tracker.Location){
-                if(inMetaPlace(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
-                    tracker.alart.keepOut = true;
-                    console.log("map to meta"); 
-                    return tracker.trackerName + "さんが" + map.meta + "の" + map.name + "に侵入しています！";
-                }else if(inPlace(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
-                    tracker.alart.keepOut = true;
-                    console.log("map"); 
-                    return tracker.trackerName + "さんが" + map.name + "に侵入しています！";
-                }else if(inMeta(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
-                    tracker.alart.keepOut = true;
-                    console.log("meta"); 
-                    return tracker.trackerName + "さんが" + map.meta + "に侵入しています！";
-                }else{
-                    tracker.alart.keepOut = false;
-                    return '';
+               if(map.hasOwnProperty("meta") && map.hasOwnProperty("name")){
+                    if(includedMetaPlace(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
+                        tracker.alart.keepOut = true;
+                        console.log("map to meta"); 
+                        return tracker.trackerName + "さんが" + map.meta + "の" + map.name + "に侵入しています！";
+                    }else{
+                        tracker.alart.keepOut = false;
+                        return '';
+                    }
+                }else if(!map.hasOwnProperty("name")){
+                    if(includedMeta(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
+                        tracker.alart.keepOut = true;
+                        console.log("meta");
+                        return tracker.trackerName + "さんが" + map.meta + "に侵入しています！";
+                    }else{
+                        tracker.alart.keepOut = false;
+                        return '';
+                    }
+                }else if(!map.hasOwnProperty("meta")){
+                    if(includedPlace(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
+                        tracker.alart.keepOut = true;
+                        console.log("map"); 
+                        return tracker.trackerName + "さんが" + map.name + "に侵入しています！";
+                    }else{
+                        tracker.alart.keepOut = false;
+                        return '';
+                    }
                 }
             }
         }

@@ -14,9 +14,9 @@ module.exports = class Alart {
         const trackers = await TrackerRepository.getAllTracker();
 
         for(let tracker of trackers){
-            const lostResult = Lost.check(tracker);
-            const keepOutResult = KeepOut.check(tracker);
-
+            const lostResult = await Lost.check(tracker);
+            const keepOutResult = await KeepOut.check(tracker);
+            
             if (lostResult || keepOutResult) {
                 const message = lostResult + '</br>' + keepOutResult + '</br></br><a href="http://192.168.235.135:3000">Webで確認する</a>';
                 this.sendMail(tracker, message);
