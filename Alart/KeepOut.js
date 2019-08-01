@@ -11,7 +11,6 @@ module.exports = class KeepOut {
         const allMaps = await MapRepository.getAllMap();
         
         let map1 = allMaps.find(map => map.mapID === tracker.Location.map);
-
         const includedMeta = (map) => {
             if(map.meta == map1.mname){
                 return true;
