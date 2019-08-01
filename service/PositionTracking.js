@@ -85,7 +85,6 @@ module.exports = class PositionTracking {
         beaconAxis.map = await this.estimationMap(beaconAxis.grid);
         if(!beaconAxis.map) beaconAxis.map = nearestDetector.detectorMap;
         delete beaconAxis.weight;
-
         return beaconAxis;
     }
 
@@ -97,6 +96,10 @@ module.exports = class PositionTracking {
             else { return false; }
         }
         const allMaps = await MapRepository.getAllMap();
-        allMaps.forEach((map) => { if(isContain(map)) { return map.name }});
+        for(let map of allMaps){
+            if(isContain(map)){
+                return map.mapID;            
+            }
+        }
     }
 };
