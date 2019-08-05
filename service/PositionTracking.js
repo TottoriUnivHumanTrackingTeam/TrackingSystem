@@ -83,13 +83,8 @@ module.exports = class PositionTracking {
         const sortedDetectorDataByDistance =_.sortBy(detectionDatas, 'distance');
         const nearestDetector = await DetectorRepository.getDetector(Number(sortedDetectorDataByDistance[0].detectorNumber));
         beaconAxis.map = await this.estimationMap(beaconAxis.grid);
-
-        const allMaps = await MapRepository.getAllMap();
-
-        let map1 = allMaps.find(map => map.name === nearestDetector.detectorMap);
-        console.log(beaconAxis.map);
-        if(!beaconAxis.map) beaconAxis.map = map1.mapID;
-        console.log(beaconAxis.map);
+        
+        if(!beaconAxis.map) beaconAxis.map = nearestDetector.detectorMap;
         delete beaconAxis.weight;
         
         return beaconAxis;
