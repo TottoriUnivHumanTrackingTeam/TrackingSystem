@@ -128,6 +128,16 @@ function doubleClicked() {
 	}
 }
 
+const returnMapID = (mapName) =>{
+	let Id = maps.find(map => map.mapID === mapName);
+	if(Id){
+		return mapName;
+	}else{
+		let MapID = maps.find(map => map.name === mapName);
+		return MapID.mapID;
+	}
+}
+
 function mouseDragged() {
 	let mapName;
     if (detectors.length > 0) {
@@ -148,11 +158,7 @@ function mouseDragged() {
 							}
 						}
 					}
-					console.log(mapName);
-					console.log(dMap.name);
 					if (mapName != dMap.name){
-						console.log(mapName);
-					console.log(dMap.name);
 						alert("登録したときのマップからディテクターがはみ出さないようにしてください");
 						detector.active = false;
 					}
@@ -171,11 +177,7 @@ function mouseDragged() {
 							}
 						}
 					}
-					console.log(mapName);
-					console.log(detector.detectorMap);
 					if (mapName != detector.detectorMap){
-						console.log(mapName);
-					console.log(detector.detectorMap);
 						alert("登録したときのマップからディテクターがはみ出さないようにしてください");
 						detector.active = false;
 					}

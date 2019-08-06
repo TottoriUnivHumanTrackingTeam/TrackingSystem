@@ -93,6 +93,8 @@ function draw() {
 
 function mousePressed() {
 	let y = mouseY;
+	let metaName;
+	let c = false;
 	let map = maps.find(map => map.name === 'new');
 	if(y < height){
 		if(!map){
@@ -100,27 +102,41 @@ function mousePressed() {
 				for(i = 0; meta.size.length > i; i++){
 					if(meta.size[i].max.x - mouseX > 0 && mouseX - meta.size[i].min.x > 0 &&
 						meta.size[i].max.y - mouseY > 0 && mouseY - meta.size[i].min.y > 0){
-						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: meta.name });
+						metaName = meta.name;
 						break;
-					} else {
-						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: null});
 					}
 				}
+				if(metaName){
+					maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: metaName });
+					c = true;
+					break;
+				}
+			}
+			if(!c){
+				alert("先にメタを登録してください");
 			}
 		}else{
 			maps.pop();
-			
+			metaName = null;
+			c = false;
 			for (let meta of metas) {
 				for(i = 0; meta.size.length > i; i++){
 					if(meta.size[i].max.x - mouseX > 0 && mouseX - meta.size[i].min.x > 0 &&
 						meta.size[i].max.y - mouseY > 0 && mouseY - meta.size[i].min.y > 0){
-						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: meta.name });
+						metaName = meta.name;
 						break;
-					} else {
-						maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: null});
-					}
+					} 
+				}
+				if(metaName){
+					maps.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false, mname: metaName });
+					c = true;
+					break;
 				}
 			}
+			if(!c){
+				alert("先にメタを登録してください");
+			}
+			
 		}
 		return false;
 	}

@@ -96,11 +96,13 @@ function draw() {
 function mousePressed() {
 	let y = mouseY;
 	let meta = metas.find(meta => meta.name === 'new');
+	console.log(metas);
 	if(y < height){
 		if(!meta){
 			metas.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false });
 		}else{
 			metas.pop();
+			console.log(metas);
 			metas.push({ name: 'new', size: [{min: {x: mouseX, y: mouseY}, max: {x: mouseX, y: mouseY}}], active: false });
 		}
 		return false;
