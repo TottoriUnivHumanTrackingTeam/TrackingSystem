@@ -68,31 +68,29 @@ function draw() {
     }
 }
 
+const returnMapNAME = (mapName) =>{
+	let Name = maps.find(map => map.name === mapName);
+	if(Name){
+		return mapName;
+	}else{
+		let MapNAME = maps.find(map => map.mapID === mapName);
+		return MapNAME.name;
+	}
+}
+
 function mousePressed() {
 	if (detectors.length > 0) {
 		for (let detector of detectors) {
 			distance = dist(mouseX, mouseY, detector.detectorGrid.x, detector.detectorGrid.y);
 			if (distance < radius) {
-				if(detector.detectorNumber === 'new'){
 					detector.active = true;
 					detector.color = '#f00';
 					$('[name="detectorNumber"]').val([detector.detectorNumber]);
 					$('[name="detectorGrid.x"]').val([detector.detectorGrid.x]);
 					$('[name="detectorGrid.y"]').val([detector.detectorGrid.y]);
-					$('[name="detectorMap"]').val([detector.detectorMap]);
+					$('[name="detectorMap"]').val([returnMapNAME(detector.detectorMap)]);
 					$('[name="detectorMap"]').prop('disabled', true);
 					$('[name="detectorNumber"]').prop('disabled', false);
-				}else{
-					let dMap = maps.find(map => map.mapID === detector.detectorMap);
-					detector.active = true;
-					detector.color = '#f00';
-					$('[name="detectorNumber"]').val([detector.detectorNumber]);
-					$('[name="detectorGrid.x"]').val([detector.detectorGrid.x]);
-					$('[name="detectorGrid.y"]').val([detector.detectorGrid.y]);
-					$('[name="detectorMap"]').val([dMap.name]);
-					$('[name="detectorMap"]').prop('disabled', true);
-					$('[name="detectorNumber"]').prop('disabled', true);
-				}
 				if(detector.detectorNumber === 'new'){
 					$('[name="detectorNumber"]').prop('disabled', false);
 				}else{
@@ -128,23 +126,22 @@ function doubleClicked() {
 	}
 }
 
-const returnMapID = (mapName) =>{
-	let Id = maps.find(map => map.mapID === mapName);
+const returnMapID = (mapId) =>{
+	let Id = maps.find(map => map.mapID === mapId);
 	if(Id){
-		return mapName;
+		return mapId;
 	}else{
-		let MapID = maps.find(map => map.name === mapName);
+		let MapID = maps.find(map => map.name === mapId);
 		return MapID.mapID;
 	}
 }
 
 function mouseDragged() {
-	let mapName;
+	let mapID;
     if (detectors.length > 0) {
         for (let detector of detectors) {
             if (detector.active) {
-				let dMap = maps.find(map => map.mapID === detector.detectorMap);
-				if(dMap){
+			
                 	detector.detectorGrid.x = mouseX;
                 	detector.detectorGrid.y = mouseY;
                 	$('[name="detectorGrid.x"]').val([detector.detectorGrid.x]);
@@ -154,35 +151,15 @@ function mouseDragged() {
 						for(i = 0; map.size.length > i; i++){
 							if(map.size[i].max.x - mouseX > 0 && mouseX - map.size[i].min.x > 0 &&
 						   	   map.size[i].max.y - mouseY > 0 && mouseY - map.size[i].min.y > 0){
-								mapName = map.name;
+								mapID = map.mapID;
 							}
 						}
 					}
-					if (mapName != dMap.name){
+					if (mapID != returnMapID(detector.detectorMap)){
 						alert("登録したときのマップからディテクターがはみ出さないようにしてください");
 						detector.active = false;
 					}
 					break;
-				}else{
-					detector.detectorGrid.x = mouseX;
-                	detector.detectorGrid.y = mouseY;
-                	$('[name="detectorGrid.x"]').val([detector.detectorGrid.x]);
-					$('[name="detectorGrid.y"]').val([detector.detectorGrid.y]);
-				
-					for (let map of maps) {
-						for(i = 0; map.size.length > i; i++){
-							if(map.size[i].max.x - mouseX > 0 && mouseX - map.size[i].min.x > 0 &&
-						   	   map.size[i].max.y - mouseY > 0 && mouseY - map.size[i].min.y > 0){
-								mapName = map.name;
-							}
-						}
-					}
-					if (mapName != detector.detectorMap){
-						alert("登録したときのマップからディテクターがはみ出さないようにしてください");
-						detector.active = false;
-					}
-					break;
-				}
             }
         } 
     }
