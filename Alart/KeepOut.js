@@ -9,9 +9,10 @@ module.exports = class KeepOut {
         const keepOutList = JSON.parse(fs.readFileSync('./keepOutMapList.json', 'utf-8'));
 
         const allMaps = await MapRepository.getAllMap();
-        /* console.log(allMaps);
-        console.log(tracker.Location); */
+        
+        
         let map1 = allMaps.find(map => map.mapID === tracker.Location.map);
+        console.log(map1);
         const includedMeta = (map) => {
             if(map.meta == map1.mname){
                 return true;
@@ -39,7 +40,7 @@ module.exports = class KeepOut {
                if(map.hasOwnProperty("meta") && map.hasOwnProperty("name")){
                     if(includedMetaPlace(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
                         tracker.alart.keepOut = true;
-                        console.log("map to meta"); 
+                        console.log("map to meta");
                         return tracker.trackerName + "さんが" + map.meta + "の" + map.name + "に侵入しています！";
                     }else{
                         tracker.alart.keepOut = false;
@@ -57,7 +58,7 @@ module.exports = class KeepOut {
                 }else if(!map.hasOwnProperty("meta")){
                     if(includedPlace(map) && _.indexOf(map.IDList, tracker.trackerID) != -1){
                         tracker.alart.keepOut = true;
-                        console.log("map"); 
+                        console.log("map");
                         return tracker.trackerName + "さんが" + map.name + "に侵入しています！";
                     }else{
                         tracker.alart.keepOut = false;
