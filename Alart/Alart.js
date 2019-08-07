@@ -12,7 +12,6 @@ const KeepOut = require("./KeepOut");
 module.exports = class Alart {
     static async check(){
         const trackers = await TrackerRepository.getAllTracker();
-
         for(let tracker of trackers){
             const lostResult = await Lost.check(tracker);
             const keepOutResult = await KeepOut.check(tracker);

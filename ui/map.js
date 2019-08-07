@@ -43,6 +43,7 @@ function draw() {
     for(let tracker of trackers) {
         if(Object.keys(tracker.Location).length){
             if(tracker.alart.keepOut) {
+                console.log("a");
                 textSize(20);
                 textAlign(LEFT, TOP);
                 fill(color('red'));
