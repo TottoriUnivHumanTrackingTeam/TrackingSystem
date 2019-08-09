@@ -213,21 +213,16 @@ const mapSubmit = function mapSubmit() {
 			contentType: "application/json; charset=utf-8"
 		})
 		.then((map) => {
-			
 			if(meta){
-				console.log(meta);
 				let meta1 = metas.find(meta => meta.name ===map.mname);
-				
 				let IDList = meta1.mapIDList.concat();
-				let newIDList = IDList.push(map.mapID);
-				
+				IDList.push(map.mapID);
 				res.push(meta.name);
-				res.push(newIDList);
-				
+				res.push(IDList);
 				$.ajax({
 				url:'http://localhost:3000/api/meta',
 				type:'PUT',
-				data: JSON.stringify(meta),
+				data: JSON.stringify(res),
 				contentType: "application/json; charset=utf-8"
 				})
 				window.location.reload();
