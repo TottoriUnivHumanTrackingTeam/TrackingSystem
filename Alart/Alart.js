@@ -59,8 +59,8 @@ module.exports = class Alart {
             }
             smtp.close();
             tracker.mailTimeStamp = date.getTime();
-            TrackerRepository.updateTracker(tracker.trackerID, tracker);
         }
+        TrackerRepository.updateTracker(tracker.trackerID, tracker);
     }
 
     static abs(val) {

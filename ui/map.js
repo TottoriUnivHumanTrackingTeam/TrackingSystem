@@ -43,10 +43,11 @@ function draw() {
     for(let tracker of trackers) {
         if(Object.keys(tracker.Location).length){
             if(tracker.alart.keepOut) {
-                console.log("a");
+                
                 textSize(20);
                 textAlign(LEFT, TOP);
                 fill(color('red'));
+               
                 text(tracker.trackerName + "さんが立入禁止区域に侵入しています！",
                     tracker.Location.grid.x + 30, tracker.Location.grid.y + 30);
                 image(alartTrackedPeople, tracker.Location.grid.x, tracker.Location.grid.y);

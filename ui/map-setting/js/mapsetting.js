@@ -193,8 +193,9 @@ function mouseDragged() {
 const mapSubmit = function mapSubmit() {
 	let map1 = maps.find(map => map.name === 'new');
 	const mapName = $('[name="name"]').val();
-	const mapSize = []
-	const metaName = map1.mname
+	const mapSize = [];
+	const metaName = map1.mname;
+	let res = [];
 	for(i = 0; map1.size.length > i; i++ ){
 		mapSize[i] = map1.size[i] 
 	}
@@ -212,9 +213,17 @@ const mapSubmit = function mapSubmit() {
 			contentType: "application/json; charset=utf-8"
 		})
 		.then((map) => {
+			
 			if(meta){
-				meta.mapName = map.mName
-				meta.mapID = map.mapID;
+				console.log(meta);
+				let meta1 = metas.find(meta => meta.name ===map.mname);
+				
+				let IDList = meta1.mapIDList.concat();
+				let newIDList = IDList.push(map.mapID);
+				
+				res.push(meta.name);
+				res.push(newIDList);
+				
 				$.ajax({
 				url:'http://localhost:3000/api/meta',
 				type:'PUT',
@@ -233,14 +242,35 @@ const mapSubmit = function mapSubmit() {
 
 const mapDelete = function mapDelete() {
 	const mapName = $('[name="name"]').val();
+	let res =[];
 	if(mapName) {
-		const num = maps.findIndex(map => map.name === mapName);
+		let map1 = maps.find(map => map.name === mapName);
+		let meta = metas.find(meta => meta.name ===map1.mname);
+		let IDList = meta.mapIDList.concat();
+		let newIDList = IDList.filter(a => a !== map1.mapID);
+
+		res.push(meta.name);
+		res.push(newIDList);
+
+		console.log(res);
 		$.ajax({
 			url:'http://localhost:3000/api/map',
 			type:'DELETE',
 			data: JSON.stringify({mapName}),
 			contentType: "application/json; charset=utf-8"
+		})
+		.then(() => {
+			$.ajax({
+			url:'http://localhost:3000/api/meta',
+			type:'PUT',
+			data: JSON.stringify(res),
+			contentType: "application/json; charset=utf-8"
+			});
+			window.location.reload();
+		},() => {
+			alert("マップが削除されませんでした。");
 		});
+	}else{
+		alert("マップを選択してください。");
 	}
-	window.location.reload();
 }

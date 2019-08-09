@@ -67,9 +67,9 @@ module.exports = class MetaRepository {
           console.log(err);
         });
         const db = client.db(DBName);
-        const mName = metaData.name;
-        const mapID = metaData.mapID;
-        const res = await db.collection('meta').update({name:mName},{$push:{"mapIDList":mapID}});
+        const mName = metaData[0];
+        const mapID = metaData[1];
+        const res = await db.collection('meta').update({name:mName},{$set:{"mapIDList":mapID}});
         client.close();
         return res.result;
     }
