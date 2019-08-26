@@ -15,6 +15,7 @@ module.exports = class DetectionDataRepository {
   static async addDetectionData(putDetectionData) {
     const detectionData = [];
     _.each(putDetectionData, (data) => {
+      console.log(data);
       detectionData.push(new DetectionData(
         Number(data["detectorNumber"]),
         Number(data["rssi"]),
@@ -23,15 +24,14 @@ module.exports = class DetectionDataRepository {
         data["detectedTime"])
       );
     });
-
-      const client = await MongoClient.connect(DBURL)
-          .catch((err) => {
-              console.log(err);
-          });
-      const db = client.db(DBName);
-      const res = await db.collection('detectionData').insertMany(detectionData);
-      client.close();
-      return res.result;
+    const client = await MongoClient.connect(DBURL)
+        .catch((err) => {
+            console.log(err);
+        });
+    const db = client.db(DBName);
+    const res = await db.collection('detectionData').insertMany(detectionData);
+    client.close();
+    return res.result;
   }
 
   static async getDetectionData(searchBeaconID, searchTimes) {
