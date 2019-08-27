@@ -47,7 +47,7 @@ module.exports = class PositionTracking {
                     fixedDetectionDatas.push(fixedDetectionData);
                 }
                 const beaconAxis = await this.positionCalc(tracker.beaconID, fixedDetectionDatas);
-                console.log(beaconAxis);
+                
                 LocationRepository.addLocation(beaconAxis);
             }
         }
@@ -83,7 +83,6 @@ module.exports = class PositionTracking {
         }
         const sortedDetectorDataByDistance =_.sortBy(detectionDatas, 'distance');
         const nearestDetector = await DetectorRepository.getDetector(Number(sortedDetectorDataByDistance[0].detectorNumber));
-        console.log(nearestDetector);
         beaconAxis.map = await this.estimationMap(beaconAxis.grid);
         if(!beaconAxis.map) beaconAxis.map = nearestDetector.detectorMap;
         delete beaconAxis.weight;
@@ -104,6 +103,6 @@ module.exports = class PositionTracking {
                 return map.mapID;            
             }
         }
-        console.log("a");
+    
     }
 };

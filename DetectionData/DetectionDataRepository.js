@@ -13,9 +13,9 @@ const DBURL = config.DB.URL + '/' + DBName;
 
 module.exports = class DetectionDataRepository {
   static async addDetectionData(putDetectionData) {
+    
     const detectionData = [];
     _.each(putDetectionData, (data) => {
-      console.log(data);
       detectionData.push(new DetectionData(
         Number(data["detectorNumber"]),
         Number(data["rssi"]),
