@@ -1,6 +1,6 @@
 "use strict";
 
-const LocationRepository = require("../Location/LocationRepository");
+const LocationRepository = require("./LocationRepository");
 
 module.exports = class Handler {
   static getLocationByTimeAndMap(req, res) {

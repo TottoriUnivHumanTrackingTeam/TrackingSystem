@@ -1,6 +1,6 @@
 "use strict";
 
-const MapRepository = require("../Map/MapRepository");
+const MapRepository = require("./MapRepository");
 
 module.exports = class Handler {
   static addMap(req, res) {

@@ -1,6 +1,6 @@
 "use strict";
 
-const DetectorRepository = require("../Detector/DetectorRepository");
+const DetectorRepository = require("./DetectorRepository");
 
 module.exports = class Handler {
   static addDetector(req, res) {

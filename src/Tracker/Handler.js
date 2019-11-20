@@ -1,6 +1,6 @@
 "use strict";
 
-const TrackerRepository = require("../Tracker/TrackerRepository");
+const TrackerRepository = require("./TrackerRepository");
 
 module.exports = class Handler {
   static addTracker(req, res) {

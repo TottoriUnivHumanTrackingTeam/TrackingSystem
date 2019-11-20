@@ -1,6 +1,6 @@
 "use strict";
 
-const MetaRepository = require("../Meta/MetaRepository");
+const MetaRepository = require("./MetaRepository");
 
 module.exports = class Handler {
   static addMeta(req, res) {

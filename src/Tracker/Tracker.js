@@ -1,7 +1,7 @@
 "use strict";
 
 const uuidV4 = require("uuid/v4");
-const Identicon = require("identicon.js");
+const Identicon = require("../../node_modules/identicon.js/identicon");
 
 module.exports = class Tracker {
   constructor(trackerName, beaconID, userStatus = "Tenant") {
