@@ -40,7 +40,7 @@ export default function RealtimeMapView(props) {
   return (
     <div className="MapView">
       <P5Wrapper sketch={Map} trackers={trackers} />
-      <AlertBuzzer trackers={trackers} />
+      {/*<AlertBuzzer trackers={trackers} />*/}
     </div>
   );
 }
