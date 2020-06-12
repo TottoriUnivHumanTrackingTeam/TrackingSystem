@@ -68,7 +68,7 @@ module.exports = class PositionTracking {
       const detector = await DetectorRepository.getDetector(Number(detectionData.detectorNumber));
       const weightForCalc = detectionData.numOfDataForAve / detectionDatas.length;
       detectionData.distance =
-        10 ** (((detectionData.TxPower - detectionData.RSSI) / 10) * weightOfDistance);
+        10 ** ((detectionData.TxPower - detectionData.RSSI) / (10 * weightOfDistance));
 
       beaconAxis.grid.x += (detector.detectorGrid.x / detectionData.distance) * weightForCalc;
       beaconAxis.grid.y += (detector.detectorGrid.y / detectionData.distance) * weightForCalc;
