@@ -45,7 +45,8 @@ export default function PlaybackButton(props) {
           <MenuItem value={1000}>等速</MenuItem>
           <MenuItem value={500}>2倍速</MenuItem>
           <MenuItem value={200}>5倍速</MenuItem>
-          <MenuItem value={10}>10倍速</MenuItem>
+          <MenuItem value={100}>10倍速</MenuItem>
+          <MenuItem value={10}>100倍速</MenuItem>
         </Select>
       </Grid>
     </Grid>
