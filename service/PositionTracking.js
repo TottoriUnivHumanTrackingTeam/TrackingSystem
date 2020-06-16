@@ -15,7 +15,7 @@ module.exports = class PositionTracking {
   static async updateLocations(calcTime) {
     const allTrackers = await TrackerRepository.getAllTracker();
     const calcTimeQuery = {
-      start: calcTime - 3000, //MAMORIOは6000
+      start: calcTime - 3000, //MAMORIOは6000 3秒前でデータ取得
       end: calcTime
     };
     for (let tracker of allTrackers) {
@@ -23,13 +23,12 @@ module.exports = class PositionTracking {
         tracker.beaconID,
         calcTimeQuery
       );
-      //console.log(detectionDatas);
+      //console.log(detectionDatas.length); 受信データ数の表示
       if (detectionDatas.length) {
-        const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber');
-
+        const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber'); //受信機の番号分け
         let fixedDetectionDatas = [];
         for (let detectorNum in dataGroupByDetectorNum) {
-          const sortedDetectorData = _.sortBy(dataGroupByDetectorNum[detectorNum], 'RSSI');
+          const sortedDetectorData = _.sortBy(dataGroupByDetectorNum[detectorNum], 'RSSI'); //受信機の番号ごとのRSSIソート
           //const median = sortedDetectorData[sortedDetectorData.length/2].RSSI;
 
           let aveRSSI = 0;
@@ -44,7 +43,7 @@ module.exports = class PositionTracking {
             RSSI: aveRSSI,
             TxPower: dataGroupByDetectorNum[detectorNum][0].TxPower,
             numOfDataForAve: sortedDetectorData.length
-          };
+          }; //受信機ごとの平均RSSIと受信件数を示すデータ
 
           fixedDetectionDatas.push(fixedDetectionData);
         }
@@ -66,33 +65,42 @@ module.exports = class PositionTracking {
 
     for (let detectionData of detectionDatas) {
       const detector = await DetectorRepository.getDetector(Number(detectionData.detectorNumber));
-      const weightForCalc = detectionData.numOfDataForAve / detectionDatas.length;
+      const weightForCalc = detectionData.numOfDataForAve / detectionDatas.length; //受信機ごとの受信件数を受信機数で割る
       detectionData.distance =
-        10 ** ((detectionData.TxPower - detectionData.RSSI) / (10 * weightOfDistance));
-
-      beaconAxis.grid.x += (detector.detectorGrid.x / detectionData.distance) * weightForCalc;
+        10 ** ((detectionData.TxPower - detectionData.RSSI) / (10 * weightOfDistance)); //フリスの伝達
+      beaconAxis.grid.x += (detector.detectorGrid.x / detectionData.distance) * weightForCalc; //受信機設置場所から距離を割って重み付与
       beaconAxis.grid.y += (detector.detectorGrid.y / detectionData.distance) * weightForCalc;
-      beaconAxis.weight += (1 / detectionData.distance) * weightForCalc;
+      beaconAxis.weight += (1 / detectionData.distance) * weightForCalc; //座標の重みづけ（フィンガープリンティング？）
+      /* 受信機ごとの情報取得
+      console.log("THIS IS DISTANCE")
+      console.log(detectionData);
+      console.log(detectionData.distance); 
+      */
+      //console.log(beaconAxis);
     }
 
     beaconAxis.grid.x = parseInt(beaconAxis.grid.x / beaconAxis.weight);
     beaconAxis.grid.y = parseInt(beaconAxis.grid.y / beaconAxis.weight);
 
-    const lastLocation = await LocationRepository.getLocationByTime(beaconAxis.beaconID, {
+    const lastLocation = await LocationRepository.getLocationByTime(beaconAxis.beaconID, { //時間が飛んだ時の取得を防ぐ
       start: beaconAxis.time - 1200,
       end: beaconAxis.time
     });
     if (lastLocation[0]) {
-      beaconAxis.grid.x = parseInt((lastLocation[0].grid.x * 1.6 + beaconAxis.grid.x * 0.4) / 2);
-      beaconAxis.grid.y = parseInt((lastLocation[0].grid.y * 1.6 + beaconAxis.grid.y * 0.4) / 2);
+      beaconAxis.grid.x = parseInt((lastLocation[0].grid.x * 1.6 + beaconAxis.grid.x * 0.4) / 2); //1.6と0.4は任意で位置に重み
+      beaconAxis.grid.y = parseInt((lastLocation[0].grid.y * 1.6 + beaconAxis.grid.y * 0.4) / 2); 
     }
     const sortedDetectorDataByDistance = _.sortBy(detectionDatas, 'distance');
     const nearestDetector = await DetectorRepository.getDetector(
       Number(sortedDetectorDataByDistance[0].detectorNumber)
     );
-    beaconAxis.map = await this.estimationMap(beaconAxis.grid);
+    beaconAxis.map = await this.estimationMap(beaconAxis.grid); //受信機位置のmapに埋め込む
     if (!beaconAxis.map) beaconAxis.map = nearestDetector.detectorMap;
     delete beaconAxis.weight;
+    /* 位置推定結果
+    console.log("THIS IS DETECTED");
+    console.log(beaconAxis);
+    */
 
     return beaconAxis;
   }
