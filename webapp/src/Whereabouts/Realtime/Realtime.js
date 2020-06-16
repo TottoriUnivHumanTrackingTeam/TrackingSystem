@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Realtime.scss';
 import MapView from './MapView';
 import TrackerSelector from '../TrackerSelector';
+import TrackingButton from './TrackingButton';
 
 export default function Realtime(props) {
   const [trackers, setTrackers] = useState([]);
@@ -15,6 +16,9 @@ export default function Realtime(props) {
       </div>
       <div className="Map">
         <MapView chosenTrackers={trackers} />
+      </div>
+      <div className="TrackingButton">
+        <TrackingButton />
       </div>
     </div>
   );
