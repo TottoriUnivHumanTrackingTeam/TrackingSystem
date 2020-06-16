@@ -13,6 +13,12 @@ const weightOfDistance = 1.8;
 
 module.exports = class PositionTracking {
   static async updateLocations(calcTime) {
+    const dt = new Date();
+    const y = dt.getFullYear();
+    const m = ("00" + (dt.getMonth()+1)).slice(-2);
+    const d = ("00" + dt.getDate()).slice(-2);
+    const dateNow = y + m + d;
+
     const allTrackers = await TrackerRepository.getAllTracker();
     const calcTimeQuery = {
       start: calcTime - 3000, //MAMORIOは6000 3秒前でデータ取得
@@ -21,7 +27,8 @@ module.exports = class PositionTracking {
     for (let tracker of allTrackers) {
       const detectionDatas = await DetectionDataRepository.getDetectionData(
         tracker.beaconID,
-        calcTimeQuery
+        calcTimeQuery,
+        dateNow //データベースなら削除
       );
       //console.log(detectionDatas.length); 受信データ数の表示
       if (detectionDatas.length) {

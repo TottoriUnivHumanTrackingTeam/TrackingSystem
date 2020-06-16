@@ -9,4 +9,12 @@ module.exports = class Handler {
       res.send("DetectionData Add Success!");
     });
   }
+  /*
+  static getDetectionData(req, res) {
+    const detectionData = req.body;
+    DetectionDataRepository.getDetectionData(detectionData).then(() => {
+      res.send("DetectionData Get Success!");
+    })
+  }
+  */
 };
