@@ -26,15 +26,7 @@ module.exports = class DetectionDataRepository {
         )
       );
     });
-/*  データベースならこっち
-    const client = await MongoClient.connect(DBURL).catch(err => {
-      console.log(err);
-    });
-    const db = client.db(DBName);
-    const res = await db.collection("detectionData").insertMany(detectionData);
-    client.close();
-    return res.result;
-    */
+
    const dt = new Date();
    const y = dt.getFullYear();
    const m = ("00" + (dt.getMonth()+1)).slice(-2);
@@ -68,32 +60,7 @@ module.exports = class DetectionDataRepository {
      }
    });
   }
-/*  データベースならこっち
-  static async getDetectionData(searchBeaconID, searchTimes) {
-    const client = await MongoClient.connect(DBURL).catch(err => {
-      console.log(err);
-    });
-    const db = client.db(DBName);
-    const searchQuery = {
-      $and: [
-        {
-          detectedTime: { $lte: searchTimes["end"], $gte: searchTimes["start"] }
-        },
-        { beaconID: searchBeaconID }
-      ]
-    };
-    const detectionDataQuery = await db
-      .collection("detectionData")
-      .find(searchQuery)
-      .toArray();
-    client.close();
-    let detectionDatas = [];
-    for (let detectionData of detectionDataQuery) {
-      detectionDatas.push(detectionData);
-    }
-    return detectionDatas;
-  }
-  */
+ 
   static async getDetectionData(searchBeaconID, searchTimes, dateTime) {
     const logName = dateTime + ".json";
     const logPath = path.join('./var/log/', logName);
