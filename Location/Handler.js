@@ -18,9 +18,11 @@ module.exports = class Handler {
       });
   }
 
-  static deleteAllLocation(req, res) {
-    LocationRepository.deleteAllLocation().then(() => {
-      res.send("Location Delete Success!")
+  static transferDocument(req, res) {
+    LocationRepository.transferDocument().then(() => {
+      LocationRepository.deleteAllLocation().then(() => {
+        res.send("Location TransferDocument Success!")
+      })
     })
   }
 };

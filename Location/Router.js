@@ -9,7 +9,7 @@ router.get('/:id', (request, response) => {
 });
 
 router.delete('/', (request, response) => {
-  Handler.deleteAllLocation(request, response)
+  Handler.transferDocument(request, response)
 })
 
 module.exports = router;

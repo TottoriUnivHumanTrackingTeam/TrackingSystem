@@ -110,6 +110,31 @@ module.exports = class LocationRepository {
     client.close();
     return locationQuery[0];
   }
+  //LocationをJson形式でローカル保存
+  static async transferDocument(){
+    const client = await MongoClient.connect(DBURL).catch(err => {
+      console.log(err);
+    });
+    const db = client.db(DBName);
+    const detectionDataQuery = await db
+      .collection("location")
+      .find()
+      .toArray();
+    client.close();
+    const dt = new Date();
+    const y = dt.getFullYear();
+    const m = ("00" + (dt.getMonth()+1)).slice(-2);
+    const d = ("00" + dt.getDate()).slice(-2);
+    const dateNow = y + m + d;
+    const loggerPath = path.join(path.dirname(__dirname), "/var/location");
+    const logName = dateNow + ".json";
+    const jsonData = JSON.stringify(detectionDataQuery, null, ' ');
+    fs.writeFile(path.join(loggerPath, logName), jsonData, (err) => {
+      if (err){
+        console.log(err);
+      }
+    });
+  }
   //LocationをDBから全件削除
   static async deleteAllLocation(){
     const client = await MongoClient.connect(DBURL).catch(err => {

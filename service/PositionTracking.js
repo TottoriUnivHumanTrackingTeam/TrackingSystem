@@ -24,11 +24,12 @@ module.exports = class PositionTracking {
       start: calcTime - 3000, //MAMORIOは6000 3秒前でデータ取得
       end: calcTime
     };
+    //FIX ME: DetectionDataの取得をDBかJsonかを選べるようにする
     for (let tracker of allTrackers) {
-      const detectionDatas = await DetectionDataRepository.getDetectionDataByJson(
+      const detectionDatas = await DetectionDataRepository.getDetectionData(
         tracker.beaconID,
         calcTimeQuery,
-        dateNow //データベースなら削除
+        //dateNow //データベースなら削除
       );
       //console.log(detectionDatas.length); 受信データ数の表示
       if (detectionDatas.length) {
