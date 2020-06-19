@@ -9,12 +9,10 @@ module.exports = class Handler {
       res.send("DetectionData Add Success!");
     });
   }
-  /*
-  static getDetectionData(req, res) {
-    const detectionData = req.body;
-    DetectionDataRepository.getDetectionData(detectionData).then(() => {
-      res.send("DetectionData Get Success!");
+
+  static deleteAllDetectionData(req, res) {
+    DetectionDataRepository.deleteAllDetectionData().then(() => {
+      res.send("DetectionData Delete Success!");
     })
   }
-  */
 };

@@ -7,9 +7,9 @@ const router = express.Router();
 router.post('/', (request, response) => {
   Handler.addDetectionData(request, response)
 });
-/*
-router.get('/', (request, response) => {
-  Handler.getDetectionData(request, response)
+
+router.delete('/', (request, response) => {
+  Handler.deleteAllDetectionData(request, response)
 })
-*/
+
 module.exports = router;

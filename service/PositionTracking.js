@@ -25,7 +25,7 @@ module.exports = class PositionTracking {
       end: calcTime
     };
     for (let tracker of allTrackers) {
-      const detectionDatas = await DetectionDataRepository.getDetectionData(
+      const detectionDatas = await DetectionDataRepository.getDetectionDataByJson(
         tracker.beaconID,
         calcTimeQuery,
         dateNow //データベースなら削除
