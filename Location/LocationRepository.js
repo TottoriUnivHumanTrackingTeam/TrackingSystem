@@ -110,4 +110,33 @@ module.exports = class LocationRepository {
     client.close();
     return locationQuery[0];
   }
+  //LocationをDBから全件削除
+  static async deleteAllLocation(){
+    const client = await MongoClient.connect(DBURL).catch(err => {
+      console.log(err);
+    });
+    const db = client.db(DBName);
+    const res = await db
+      .collection("location")
+      .deleteMany({});
+    client.close();
+    return res.result;
+  }
+  //ローカル保存のjsonを必要時にDBへ押し込む(searchDateは日付)
+  static async loadAndDeployJsonLocation(searchDate){
+    const loggerPath = path.join(path.dirname(__dirname), "/var/log");
+    const logName = searchDate + ".json"
+    const jsonObject = JSON.parse(fs.readFileSync(path.join(loggerPath, logName), (err) => {
+      console.log(err);
+    }));
+    const client = await MongoClient.connect(DBURL).catch(err => {
+      console.log(err);
+    });
+    const db = client.db(DBName);
+    const res = await db
+      .collection("temporaryLocation")
+      .insertMany(jsonObject);
+    client.close();
+    return res.result;
+  }
 };

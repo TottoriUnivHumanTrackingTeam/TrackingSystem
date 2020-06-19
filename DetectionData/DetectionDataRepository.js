@@ -78,7 +78,7 @@ module.exports = class DetectionDataRepository {
     }
     return detectionDatas;
   }
-
+  //JsonからDetectionDataを取得する
   static async getDetectionDataByJson(searchBeaconID, searchTimes, dateTime) {
     const logName = dateTime + ".json";
     const logPath = path.join('./var/log/', logName);
@@ -99,16 +99,15 @@ module.exports = class DetectionDataRepository {
     }
     return detectionDatas;
   }
-  //detectionDataをDBから全件削除(searchTimesは未実装)
-  static async deleteAllDetectionData(searchTimes){
+  //detectionDataをDBから全件削除
+  static async deleteAllDetectionData(){
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
     const db = client.db(DBName);
-    const searchQuery = { detectedTime: {$lte: searchTimes["end"], $gte: searchTimes["start"]}};
     const res = await db
       .collection("detectionData")
-      .deleteMany({}); //searchQueryを入れると条件で削除
+      .deleteMany({});
     client.close();
     return res.result;
   }
