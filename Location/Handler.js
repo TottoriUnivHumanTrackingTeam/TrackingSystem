@@ -1,6 +1,7 @@
 "use strict";
 
 const LocationRepository = require("../Location/LocationRepository");
+const cron = require("node-cron");
 
 module.exports = class Handler {
   static getLocationByTimeAndMap(req, res) {
@@ -19,9 +20,11 @@ module.exports = class Handler {
   }
 
   static transferDocument(req, res) {
-    LocationRepository.transferDocument().then(() => {
-      LocationRepository.deleteAllLocation().then(() => {
-        res.send("Location TransferDocument Success!")
+    cron.schedule('0 0 0 * * *', () => {
+      LocationRepository.transferDocument().then(() => {
+        LocationRepository.deleteAllLocation().then(() => {
+          res.send("Location TransferDocument Success!")
+        })
       })
     })
   }

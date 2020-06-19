@@ -5,6 +5,9 @@ require('dotenv').config();
 const MongoClient = require("mongodb").MongoClient;
 const Location = require("./Location");
 
+const path = require('path');
+const fs = require('fs');
+
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
 
