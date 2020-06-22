@@ -8,9 +8,19 @@ const DetectionData = require("./DetectionData");
 
 const fs = require("fs");
 const path = require("path");
+const readline = require("readline")
 
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
+
+const isExistFile = (file) => {
+  try {
+    fs.statSync(file);
+    return true
+  } catch(err) {
+    if(err.code === 'ENOENT') return false
+  }
+}
 
 module.exports = class DetectionDataRepository {
   static async addDetectionData(putDetectionData) {
@@ -41,13 +51,11 @@ module.exports = class DetectionDataRepository {
     const dateNow = y + m + d;
     const logName = dateNow + ".json";
     const logPath = path.join('./var/log/', logName)
-    fs.stat(logPath, (err, stats) => {
-      if (err) {
-        fs.writeFile(logPath, "", (err) => {
-          console.log(err);
-        });
-      }
-    });
+    if (!isExistFile(logPath)) {
+      fs.writeFile(logPath, "", (err) => {
+        console.log(err);
+      });
+    };
     if (detectionData !== null){
       fs.appendFileSync(logPath, JSON.stringify(detectionData));
     }
@@ -100,7 +108,7 @@ module.exports = class DetectionDataRepository {
     return detectionDatas;
   }
   //detectionDataをDBから全件削除
-  static async deleteAllDetectionData(){
+  static async deleteAllDetectionData() {
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
@@ -110,5 +118,37 @@ module.exports = class DetectionDataRepository {
       .deleteMany({});
     client.close();
     return res.result;
+  }
+  //Detectorのログ解析
+  static async detectorLog2Json() {
+    const dt = new Date();
+    dt.setDate(dt.getDate()-1)
+    const y = dt.getFullYear();
+    const m = dt.getMonth()+1;
+    const d = 16 //dt.getDate();
+    const log2json = []
+    for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
+      const logName = `No${detectorNumber}_${y}_${m}_${d}.log`;
+      const logPath = path.join('./var/detector/', logName)
+      if (isExistFile(logPath)) {
+        const rs = fs.createReadStream(logPath);
+        const rl = readline.createInterface(rs, {});
+        rl.on('line', (line) => {
+          const contents = line.split(",")
+          const jsonObj = {
+            "detectorNumber": Number(contents[0]), 
+            "RSSI": Number(contents[3]), 
+            "TxPower": Number(contents[2]), 
+            "beaconID": contents[1], 
+            "detectedTime": contents[4]
+          }
+          log2json.push(JSON.stringify(jsonObj));
+        })
+      } else { 
+        continue;
+      }
+    }
+    console.log(log2json)
+    return log2json;
   }
 };

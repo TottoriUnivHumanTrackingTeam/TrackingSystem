@@ -1,6 +1,7 @@
 "use strict";
 
 const DetectionDataRepository = require("../DetectionData/DetectionDataRepository");
+const cron = require('node-cron');
 
 module.exports = class Handler {
   static addDetectionData(req, res) {
@@ -11,8 +12,10 @@ module.exports = class Handler {
   }
 
   static deleteAllDetectionData(req, res) {
-    DetectionDataRepository.deleteAllDetectionData().then(() => {
-      res.send("DetectionData Delete Success!");
+    cron.schedule('0 0 0 * * *', () => {
+      DetectionDataRepository.deleteAllDetectionData().then(() => {
+        res.send("DetectionData Delete Success!");
+      })
     })
   }
 };

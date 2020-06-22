@@ -4,10 +4,13 @@ import Button from '@material-ui/core/Button';
 export default function TrackingButton(props) {
     const startTracking = () => {
         fetch(`${process.env.REACT_APP_API_URL}/api/tracking/start`).then(() => {
-            fetch(`${process.env.REACT_APP_API_URL}/api/location`, {method: "delete"}).catch((err) => {
-                console.log(err)
-            })}).catch((err) => {console.log(err)})
-    }
+            fetch(`${process.env.REACT_APP_API_URL}/api/detectionData`, {method: "delete"}).then(() => {
+                fetch(`${process.env.REACT_APP_API_URL}/api/location`, {method: "delete"}).catch((err) => {
+                    console.log(err)
+                })
+            })
+        })
+    }  
 
     return (
         <Button
