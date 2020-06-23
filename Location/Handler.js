@@ -20,7 +20,6 @@ module.exports = class Handler {
   }
 
   static transferDocument(req, res) {
-    //なぜか動かない（ボタンによるFetchも）
     cron.schedule('0 0 0 * * *', () => {
       LocationRepository.transferDocument().then(() => {
         LocationRepository.deleteAllLocation().then(() => {

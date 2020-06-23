@@ -119,20 +119,24 @@ module.exports = class LocationRepository {
       console.log(err);
     });
     const db = client.db(DBName);
-    const detectionDataQuery = await db
+    const locationDataQuery = await db
       .collection("location")
       .find()
       .toArray();
     client.close();
+    let locationDatas = [];
+    for (let locationData of locationDataQuery){
+      locationDatas.push(locationData);
+    }
     const dt = new Date();
     const y = dt.getFullYear();
     const m = ("00" + (dt.getMonth()+1)).slice(-2);
     const d = ("00" + dt.getDate()).slice(-2);
     const dateNow = y + m + d;
-    const loggerPath = path.join(path.dirname(__dirname), "/var/location");
-    const logName = dateNow + ".json";
-    const jsonData = JSON.stringify(detectionDataQuery, null, ' ');
-    fs.writeFile(path.join(loggerPath, logName), jsonData, (err) => {
+    const logName = dateNow + ".log";
+    const loggerPath = path.join("./var/location", logName);
+    const jsonData = JSON.stringify(locationDatas, null, ' ');
+    fs.writeFile(loggerPath, jsonData, (err) => {
       if (err){
         console.log(err);
       }
