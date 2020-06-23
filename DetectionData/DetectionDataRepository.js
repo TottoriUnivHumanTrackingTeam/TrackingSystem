@@ -127,28 +127,38 @@ module.exports = class DetectionDataRepository {
     const m = dt.getMonth()+1;
     const d = 16 //dt.getDate();
     const log2json = []
-    for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
-      const logName = `No${detectorNumber}_${y}_${m}_${d}.log`;
-      const logPath = path.join('./var/detector/', logName)
-      if (isExistFile(logPath)) {
-        const rs = fs.createReadStream(logPath);
-        const rl = readline.createInterface(rs, {});
-        rl.on('line', (line) => {
-          const contents = line.split(",")
-          const jsonObj = {
-            "detectorNumber": Number(contents[0]), 
-            "RSSI": Number(contents[3]), 
-            "TxPower": Number(contents[2]), 
-            "beaconID": contents[1], 
-            "detectedTime": contents[4]
-          }
-          log2json.push(JSON.stringify(jsonObj));
-        })
-      } else { 
-        continue;
-      }
+    function readData(detectorNumber) {
+      return new Promise((resolve, reject) => {
+        const logName = `No${detectorNumber}_${y}_${m}_${d}.log`;
+        const logPath = path.join('./var/detector/', logName)
+        if (!isExistFile(logPath)) {
+          reject();
+        } else { 
+          const rs = fs.createReadStream(logPath);
+          const rl = readline.createInterface(rs, {});
+          rl.on('line', (line) => {
+            const contents = line.split(",")
+            const jsonObj = {
+              "detectorNumber": Number(contents[0]), 
+              "RSSI": Number(contents[3]), 
+              "TxPower": Number(contents[2]), 
+              "beaconID": contents[1], 
+              "detectedTime": contents[4]
+            }
+            log2json.push(jsonObj);
+          });
+          rl.on('close', () => {
+            resolve()
+          })
+        }
+      })
     }
-    console.log(log2json)
-    return log2json;
+    const tasks = []
+    for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
+      tasks.push(readData(detectorNumber).then(result => {console.log(`DetectorNo${detectorNumber} read ok`)}))
+    }
+    Promise.allSettled(tasks).then(results => {
+      return log2json;
+    })
   }
 };
