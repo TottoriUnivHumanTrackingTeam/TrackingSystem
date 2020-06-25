@@ -25,13 +25,11 @@ module.exports = class PositionTrackingHandlers {
   }
 
   static updateYesterdayPositionTracking(req, res) {
+    //実際は生データダウンロードが終わった後に指定したい
     cron.schedule('0 0 0 * * *', () => {
-      //ここでrenewLocationにデータを渡したい
-      // DetectionDataRepository.detectorLog2Json().then(() => { 
-        PositionTracking.renewLocations().then(() => {
-          res.send("RenewLocationData Success!")
-        })
-      // })
+      PositionTracking.renewLocations().then(() => {
+        res.send("RenewLocationData Success!")
+      })
     })
   }
 };

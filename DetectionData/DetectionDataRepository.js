@@ -121,50 +121,52 @@ module.exports = class DetectionDataRepository {
   }
   //Detectorのログ解析
   static async detectorLog2Json() {
-    const dt = new Date();
-    dt.setDate(dt.getDate()-1)
-    const y = dt.getFullYear();
-    const m = dt.getMonth()+1;
-    const d = 23 //dt.getDate();
-    let log2json = []
-    function readData(detectorNumber) {
-      return new Promise((resolve, reject) => {
-        const logName = `No${detectorNumber}_${y}_${m}_${d}.log`;
-        const logPath = path.join('./var/detector/', logName)
-        const tmp = []
-        if (!isExistFile(logPath)) {
-          reject();
-        } else { 
-          const rs = fs.createReadStream(logPath);
-          const rl = readline.createInterface(rs, {});
-          rl.on('line', (line) => {
-            const contents = line.split(",")
-            const jsonObj = {
-              "detectorNumber": Number(contents[0]), 
-              "RSSI": Number(contents[3]), 
-              "TxPower": Number(contents[2]), 
-              "beaconID": contents[1], 
-              "detectedTime": contents[4]
-            }
-            tmp.push(jsonObj);
-          });
-          rl.on('close', () => {
-            resolve(tmp)
-          })
-        }
+    return new Promise((resolve, reject) => {
+      const dt = new Date();
+      dt.setDate(dt.getDate()-1)
+      const y = dt.getFullYear();
+      const m = dt.getMonth()+1;
+      const d = dt.getDate(); //生データの前日の日付
+      let log2json = []
+      //CSVログファイル読み込みの内部関数
+      function readData(detectorNumber) {
+        return new Promise((resolve, reject) => {
+          const logName = `No${detectorNumber}_${y}_${m}_${d}.log`;
+          const logPath = path.join('./var/detector/', logName)
+          const tmp = []
+          if (!isExistFile(logPath)) {
+            reject();
+          } else { 
+            const rs = fs.createReadStream(logPath);
+            const rl = readline.createInterface(rs, {});
+            rl.on('line', (line) => {
+              const contents = line.split(",")
+              const jsonObj = {
+                "detectorNumber": Number(contents[0]), 
+                "RSSI": Number(contents[3]), 
+                "TxPower": Number(contents[2]), 
+                "beaconID": contents[1], 
+                "detectedTime": contents[4]
+              }
+              tmp.push(jsonObj);
+            });
+            rl.on('close', () => {
+              resolve(tmp)
+            })
+          }
+        })
+      }
+      const tasks = []
+      //受信機数分読み込む
+      for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
+        tasks.push(readData(detectorNumber).then(result => {
+          console.log(`DetectorNo${detectorNumber} read ok`)
+          log2json = log2json.concat(result)
+        }))
+      }
+      Promise.allSettled(tasks).then(results => {
+        resolve(log2json);
       })
-    }
-    const tasks = []
-    for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
-      tasks.push(readData(detectorNumber).then(result => {
-        console.log(`DetectorNo${detectorNumber} read ok`)
-        log2json = log2json.concat(result)
-      }))
-    }
-    Promise.allSettled(tasks).then(results => {
-      const logPath = path.join('./var/detector/', `tmp${y}.json`)
-      fs.writeFileSync(logPath, JSON.stringify(log2json));
-      return log2json; // (returnが動かないのでJson)
     })
   }
 };

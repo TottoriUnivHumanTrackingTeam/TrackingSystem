@@ -138,18 +138,16 @@ module.exports = class PositionTracking {
 
   static async renewLocations() {
     const allTrackers = await TrackerRepository.getAllTracker();
-    //JSONじゃなくてレポジトリの返り値で代入したい
-    const allDetectionDatas = //await DetectionDataRepository.detectorLog2Json();
-    JSON.parse(fs.readFileSync(path.join('./var/detector/', `tmp2020.json`)))
+    const allDetectionDatas = await DetectionDataRepository.detectorLog2Json(); //ここでログ読み込み
     const sortedAllDetectorDataByDetectedTime = _.sortBy(allDetectionDatas, 'detectedTime')
     let startTime = Number(sortedAllDetectorDataByDetectedTime[0].detectedTime)
     for (let tracker of allTrackers) {
-      for(;;){
+      for(;;){ //読み込むものがなくなるまでループ
         const calcTimeQuery = {
           start: startTime,
           end: startTime + 1000
         }
-        startTime += 1000
+        startTime += 1000 //ここで1秒間隔の切り分け
         const detectionDatas = sortedAllDetectorDataByDetectedTime.filter((detectionData) => {
           const startBoolean = (Number(detectionData.detectedTime) >= Number(calcTimeQuery.start))
           const endBoolean = (Number(detectionData.detectedTime) <= Number(calcTimeQuery.end))
