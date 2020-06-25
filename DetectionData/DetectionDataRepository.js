@@ -125,12 +125,13 @@ module.exports = class DetectionDataRepository {
     dt.setDate(dt.getDate()-1)
     const y = dt.getFullYear();
     const m = dt.getMonth()+1;
-    const d = 16 //dt.getDate();
-    const log2json = []
+    const d = 23 //dt.getDate();
+    let log2json = []
     function readData(detectorNumber) {
       return new Promise((resolve, reject) => {
         const logName = `No${detectorNumber}_${y}_${m}_${d}.log`;
         const logPath = path.join('./var/detector/', logName)
+        const tmp = []
         if (!isExistFile(logPath)) {
           reject();
         } else { 
@@ -145,20 +146,25 @@ module.exports = class DetectionDataRepository {
               "beaconID": contents[1], 
               "detectedTime": contents[4]
             }
-            log2json.push(jsonObj);
+            tmp.push(jsonObj);
           });
           rl.on('close', () => {
-            resolve()
+            resolve(tmp)
           })
         }
       })
     }
     const tasks = []
     for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
-      tasks.push(readData(detectorNumber).then(result => {console.log(`DetectorNo${detectorNumber} read ok`)}))
+      tasks.push(readData(detectorNumber).then(result => {
+        console.log(`DetectorNo${detectorNumber} read ok`)
+        log2json = log2json.concat(result)
+      }))
     }
     Promise.allSettled(tasks).then(results => {
-      return log2json;
+      const logPath = path.join('./var/detector/', `tmp${y}.json`)
+      fs.writeFileSync(logPath, JSON.stringify(log2json));
+      return log2json; // (returnが動かないのでJson)
     })
   }
 };

@@ -2,6 +2,10 @@
 
 const PositionTracking = require("./PositionTracking");
 const Alert = require("../Alert/Alert");
+const DetectionDataRepository = require("../DetectionData/DetectionDataRepository")
+
+const cron = require('node-cron')
+
 let timerID;
 
 module.exports = class PositionTrackingHandlers {
@@ -18,5 +22,16 @@ module.exports = class PositionTrackingHandlers {
   static stopPositionTracking(req, res) {
     clearInterval(timerID);
     res.send("Tracking Stop!");
+  }
+
+  static updateYesterdayPositionTracking(req, res) {
+    cron.schedule('0 0 0 * * *', () => {
+      //ここでrenewLocationにデータを渡したい
+      // DetectionDataRepository.detectorLog2Json().then(() => { 
+        PositionTracking.renewLocations().then(() => {
+          res.send("RenewLocationData Success!")
+        })
+      // })
+    })
   }
 };

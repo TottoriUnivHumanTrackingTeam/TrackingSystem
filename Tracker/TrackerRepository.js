@@ -52,7 +52,8 @@ module.exports = class TrackerRepository {
       if (Object.keys(searchTimes).length) {
         tracker.Location = await LocationRepository.getLocationByTime(
           tracker.beaconID,
-          searchTimes
+          searchTimes,
+          "updateLocation"
         );
       } else {
         tracker.Location = await LocationRepository.getLocationRecently(tracker.beaconID);

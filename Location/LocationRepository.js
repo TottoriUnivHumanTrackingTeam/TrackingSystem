@@ -12,7 +12,7 @@ const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
 
 module.exports = class LocationRepository {
-  static async addLocation(putLocation) {
+  static async addLocation(putLocation, insertLocation="location") {
     const location = new Location(
       putLocation["beaconID"],
       putLocation["grid"],
@@ -24,12 +24,12 @@ module.exports = class LocationRepository {
       console.log(err);
     });
     const db = client.db(DBName);
-    const res = await db.collection("location").insert(location);
+    const res = await db.collection(insertLocation).insert(location);
     client.close();
     return res.result;
   }
   // FIX ME: Locationの取得条件を複合的に指定できるように関数を作り変える
-  static async getLocationByTime(searchBeaconID, searchTimes) {
+  static async getLocationByTime(searchBeaconID, searchTimes, searchLocation="location") {
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
@@ -43,7 +43,7 @@ module.exports = class LocationRepository {
       ]
     };
     const locationQuery = await db
-      .collection("location")
+      .collection(searchLocation)
       .find(searchQuery)
       .toArray();
     client.close();

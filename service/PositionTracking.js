@@ -2,6 +2,7 @@
 
 const _ = require('underscore');
 const fs = require('fs');
+const path = require('path')
 const TrackerRepository = require('../Tracker/TrackerRepository');
 const DetectorRepository = require('../Detector/DetectorRepository');
 const DetectionDataRepository = require('../DetectionData/DetectionDataRepository');
@@ -63,12 +64,13 @@ module.exports = class PositionTracking {
 
   static async positionCalc(beaconID, detectionDatas) {
     const date = new Date();
+    const time = detectionDatas[0].detectedTime
     let beaconAxis = {
       beaconID: beaconID,
       grid: { x: 0, y: 0 },
       weight: 0,
       map: '',
-      time: date.getTime()
+      time: (time ? time : date.getTime())
     };
 
     for (let detectionData of detectionDatas) {
@@ -93,7 +95,7 @@ module.exports = class PositionTracking {
     const lastLocation = await LocationRepository.getLocationByTime(beaconAxis.beaconID, { //時間が飛んだ時の取得を防ぐ
       start: beaconAxis.time - 1200,
       end: beaconAxis.time
-    });
+    }, time ? "updateLocation" : "location");
     if (lastLocation[0]) {
       beaconAxis.grid.x = parseInt((lastLocation[0].grid.x * 1.6 + beaconAxis.grid.x * 0.4) / 2); //1.6と0.4は任意で位置に重み
       beaconAxis.grid.y = parseInt((lastLocation[0].grid.y * 1.6 + beaconAxis.grid.y * 0.4) / 2); 
@@ -130,6 +132,59 @@ module.exports = class PositionTracking {
     for (let map of allMaps) {
       if (isContain(map)) {
         return map.mapID;
+      }
+    }
+  }
+
+  static async renewLocations() {
+    const allTrackers = await TrackerRepository.getAllTracker();
+    //JSONじゃなくてレポジトリの返り値で代入したい
+    const allDetectionDatas = //await DetectionDataRepository.detectorLog2Json();
+    JSON.parse(fs.readFileSync(path.join('./var/detector/', `tmp2020.json`)))
+    const sortedAllDetectorDataByDetectedTime = _.sortBy(allDetectionDatas, 'detectedTime')
+    let startTime = Number(sortedAllDetectorDataByDetectedTime[0].detectedTime)
+    for (let tracker of allTrackers) {
+      for(;;){
+        const calcTimeQuery = {
+          start: startTime,
+          end: startTime + 1000
+        }
+        startTime += 1000
+        const detectionDatas = sortedAllDetectorDataByDetectedTime.filter((detectionData) => {
+          const startBoolean = (Number(detectionData.detectedTime) >= Number(calcTimeQuery.start))
+          const endBoolean = (Number(detectionData.detectedTime) <= Number(calcTimeQuery.end))
+          if(startBoolean && endBoolean){
+            return true;
+          }
+        })
+        if(detectionDatas.length === 0){
+          break;
+        }
+        const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber')
+
+        let fixedDetectionDatas = [];
+        for (let detectorNum in dataGroupByDetectorNum) {
+          const sortedDetectorData = _.sortBy(dataGroupByDetectorNum[detectorNum], 'RSSI'); //受信機の番号ごとのRSSIソート
+
+          let aveRSSI = 0;
+          for (let detectorData of sortedDetectorData) {
+            aveRSSI += detectorData.RSSI;
+          }
+
+          aveRSSI = aveRSSI / sortedDetectorData.length;
+
+          let fixedDetectionData = {
+            detectorNumber: detectorNum,
+            RSSI: aveRSSI,
+            TxPower: dataGroupByDetectorNum[detectorNum][0].TxPower,
+            numOfDataForAve: sortedDetectorData.length,
+            detectedTime: startTime
+          }; //受信機ごとの平均RSSIと受信件数を示すデータ
+
+          fixedDetectionDatas.push(fixedDetectionData);
+        }
+        const beaconAxis = await this.positionCalc(tracker.beaconID, fixedDetectionDatas);
+        LocationRepository.addLocation(beaconAxis, "updateLocation")
       }
     }
   }

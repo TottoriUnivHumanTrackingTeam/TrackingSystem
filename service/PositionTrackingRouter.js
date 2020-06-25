@@ -12,4 +12,8 @@ const router = express.Router();
    Handler.stopPositionTracking(request, response)
   });
 
+  router.get('/log', (request, response) => {
+    Handler.updateYesterdayPositionTracking(request, response)
+  })
+
 module.exports = router;
