@@ -28,7 +28,9 @@ module.exports = class PositionTrackingHandlers {
     //実際は生データダウンロードが終わった後に指定したい
     cron.schedule('0 0 0 * * *', () => {
       PositionTracking.renewLocations().then(() => {
-        res.send("RenewLocationData Success!")
+        DetectionDataRepository.deleteFileDetectionData().then(() => {
+          res.send("RenewLocationData Success!")
+        })
       })
     })
   }

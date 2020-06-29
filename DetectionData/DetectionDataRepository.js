@@ -126,7 +126,7 @@ module.exports = class DetectionDataRepository {
       dt.setDate(dt.getDate()-1)
       const y = dt.getFullYear();
       const m = dt.getMonth()+1;
-      const d = dt.getDate(); //生データの前日の日付
+      const d = 23//dt.getDate(); //生データの前日の日付
       let log2json = []
       //CSVログファイル読み込みの内部関数
       function readData(detectorNumber) {
@@ -168,5 +168,17 @@ module.exports = class DetectionDataRepository {
         resolve(log2json);
       })
     })
+  }
+  //ファイル削除
+  static async deleteFileDetectionData() {
+    const dt = new Date();
+    dt.setDate(dt.getDate()-1)
+    const y = dt.getFullYear();
+    const m = ("00" + (dt.getMonth()+1)).slice(-2);
+    const d = ("00" + dt.getDate()).slice(-2);
+    const dateNow = y + m + d;
+    const logName = dateNow + ".json";
+    const logPath = path.join('./var/log/', logName)
+    fs.unlinkSync(logPath)
   }
 };

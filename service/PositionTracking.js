@@ -135,7 +135,7 @@ module.exports = class PositionTracking {
       }
     }
   }
-
+  //遅いし途中で死んでる？？（二つの受信機からで6時間半ぐらいかかる）
   static async renewLocations() {
     const allTrackers = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await DetectionDataRepository.detectorLog2Json(); //ここでログ読み込み
@@ -156,7 +156,17 @@ module.exports = class PositionTracking {
           }
         })
         if(detectionDatas.length === 0){
-          break;
+          //2秒まで許容してそれでもなかったら終わる
+          detectionDatas = sortedAllDetectorDataByDetectedTime.filter((detectionData) => {
+            const startBoolean = (Number(detectionData.detectedTime) >= Number(calcTimeQuery.start + 1000))
+            const endBoolean = (Number(detectionData.detectedTime) <= Number(calcTimeQuery.end + 1000))
+            if(startBoolean && endBoolean){
+              return true;
+            }
+          })
+          if(detectionDatas.length === 0){
+            break;
+          }
         }
         const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber')
 
