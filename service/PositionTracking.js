@@ -135,14 +135,16 @@ module.exports = class PositionTracking {
       }
     }
   }
-  //遅いし途中で死んでる？？（二つの受信機からで6時間半ぐらいかかる）
+  //遅いし途中で死んでる？？（二つの受信機からで8時間半ぐらいかかる）
   static async renewLocations() {
     const allTrackers = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await DetectionDataRepository.detectorLog2Json(); //ここでログ読み込み
     const sortedAllDetectorDataByDetectedTime = _.sortBy(allDetectionDatas, 'detectedTime')
     let startTime = Number(sortedAllDetectorDataByDetectedTime[0].detectedTime)
+    startTime = Math.floor(startTime/1000) * 1000
+    const endTime = startTime + 86400000
     for (let tracker of allTrackers) {
-      for(;;){ //読み込むものがなくなるまでループ
+      while(endTime >= startTime){ //読み込むものがなくなるまでループ
         const calcTimeQuery = {
           start: startTime,
           end: startTime + 1000
@@ -156,17 +158,7 @@ module.exports = class PositionTracking {
           }
         })
         if(detectionDatas.length === 0){
-          //2秒まで許容してそれでもなかったら終わる
-          detectionDatas = sortedAllDetectorDataByDetectedTime.filter((detectionData) => {
-            const startBoolean = (Number(detectionData.detectedTime) >= Number(calcTimeQuery.start + 1000))
-            const endBoolean = (Number(detectionData.detectedTime) <= Number(calcTimeQuery.end + 1000))
-            if(startBoolean && endBoolean){
-              return true;
-            }
-          })
-          if(detectionDatas.length === 0){
-            break;
-          }
+          continue;
         }
         const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber')
 
