@@ -126,7 +126,7 @@ module.exports = class DetectionDataRepository {
       dt.setDate(dt.getDate()-1)
       const y = dt.getFullYear();
       const m = dt.getMonth()+1;
-      const d = 23//dt.getDate(); //生データの前日の日付
+      const d = 23//dt.getDate(); //生データの前日の日付（23はマジックナンバー）
       let log2json = []
       //CSVログファイル読み込みの内部関数
       function readData(detectorNumber) {
@@ -157,7 +157,7 @@ module.exports = class DetectionDataRepository {
         })
       }
       const tasks = []
-      //受信機数分読み込む
+      //受信機数分読み込む(25はマジックナンバー)
       for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
         tasks.push(readData(detectorNumber).then(result => {
           console.log(`DetectorNo${detectorNumber} read ok`)

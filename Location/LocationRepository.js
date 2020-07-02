@@ -54,7 +54,7 @@ module.exports = class LocationRepository {
     return locations;
   }
 
-  static async getLocationByTimeAndMap(mapID, searchTimes) {
+  static async getLocationByTimeAndMap(mapID, searchTimes, searchLocation="location") {
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
@@ -68,7 +68,7 @@ module.exports = class LocationRepository {
       ]
     };
     const locationQuery = await db
-      .collection("location")
+      .collection(searchLocation)
       .find(searchQuery)
       .toArray();
     client.close();
@@ -79,14 +79,14 @@ module.exports = class LocationRepository {
     return locations;
   }
 
-  static async getLocationByBeaconIDOnly(searchBeaconID) {
+  static async getLocationByBeaconIDOnly(searchBeaconID, searchLocation="location") {
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
     const db = client.db(DBName);
     const searchQuery = { beaconID: searchBeaconID };
     const locationQuery = await db
-      .collection("location")
+      .collection(searchLocation)
       .find(searchQuery)
       .toArray();
     client.close();
@@ -114,13 +114,13 @@ module.exports = class LocationRepository {
     return locationQuery[0];
   }
   //LocationをJson形式でローカル保存
-  static async transferDocument(){
+  static async transferDocument(applyLocation="location"){
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
     const db = client.db(DBName);
     const locationDataQuery = await db
-      .collection("location")
+      .collection(applyLocation)
       .find()
       .toArray();
     client.close();
@@ -143,21 +143,21 @@ module.exports = class LocationRepository {
     });
   }
   //LocationをDBから全件削除
-  static async deleteAllLocation(){
+  static async deleteAllLocation(applyLocation="location"){
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
     const db = client.db(DBName);
     const res = await db
-      .collection("location")
+      .collection(applyLocation)
       .deleteMany({});
     client.close();
     return res.result;
   }
-  //ローカル保存のjsonを必要時にDBへ押し込む(searchDateは日付)
+  //ローカル保存のlogを必要時にDBへ押し込む(searchDateは日付)
   static async loadAndDeployJsonLocation(searchDate){
-    const loggerPath = path.join(path.dirname(__dirname), "/var/log");
-    const logName = searchDate + ".json"
+    const loggerPath = path.join(path.dirname(__dirname), "/var/location");
+    const logName = searchDate + ".log"
     const jsonObject = JSON.parse(fs.readFileSync(path.join(loggerPath, logName), (err) => {
       console.log(err);
     }));
