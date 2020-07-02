@@ -9,7 +9,7 @@ export default function TrackingButton(props) {
         fetch(`${process.env.REACT_APP_API_URL}/api/detectionData`, {method: "delete"}).then(() => {
             console.log("DetectionData delete set ok")
         })
-        fetch(`${process.env.REACT_APP_API_URL}/api/location/log`, {method: "delete"}).then(() => {
+        fetch(`${process.env.REACT_APP_API_URL}/api/location/log`, {method: "put"}).then(() => {
             console.log("LocationData transfer set ok")
         })
     }  

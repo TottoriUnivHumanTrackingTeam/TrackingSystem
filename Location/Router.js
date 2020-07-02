@@ -4,11 +4,7 @@ const Handler = require('./Handler');
 const express = require('express');
 const router = express.Router();
 
-router.put('/log/oneday', (request, response) => {
-  Handler.makeLogAndDelete(request, response)
-})
-
-router.put('/log/weekday', (request, response) => {
+router.put('/log', (request, response) => {
   Handler.makeLogAndDelete(request, response)
 })
 

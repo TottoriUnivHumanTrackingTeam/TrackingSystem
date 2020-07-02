@@ -20,10 +20,19 @@ module.exports = class Handler {
   }
 
   static makeLogAndDelete(req, res) {
+    let result = ""
     cron.schedule('0 0 0 * * *', () => {
-      LocationRepository.transferDocument(req.body).then(() => {
-        LocationRepository.deleteAllLocation(req.body).then(() => {
-          res.send("Location TransferDocument Success!")
+      cron.schedule('0 0 0 * * 1', () => {
+        LocationRepository.transferDocument("updateLocation").then(() => {
+          LocationRepository.deleteAllLocation("updateLocation").then(() => {
+            result = "UpdataLocation And "
+          })
+        })
+      })
+      LocationRepository.transferDocument("location").then(() => {
+        LocationRepository.deleteAllLocation("location").then(() => {
+          result += (result ? result : "") + "Location TransferDocument Success!"
+          res.send(result)
         })
       })
     })

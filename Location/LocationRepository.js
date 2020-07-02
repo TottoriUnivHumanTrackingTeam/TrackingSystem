@@ -114,7 +114,7 @@ module.exports = class LocationRepository {
     return locationQuery[0];
   }
   //LocationをJson形式でローカル保存
-  static async transferDocument(applyLocation="location"){
+  static async transferDocument(applyLocation){
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
@@ -134,7 +134,12 @@ module.exports = class LocationRepository {
     const d = ("00" + dt.getDate()).slice(-2);
     const dateNow = y + m + d;
     const logName = dateNow + ".log";
-    const loggerPath = path.join("./var/location", logName);
+    let loggerPath = ""
+    if(applyLocation == "location"){
+      loggerPath = path.join("./var/location", logName);
+    }else{
+      loggerPath = path.join("./var/updatalocation", logName)
+    }
     const jsonData = JSON.stringify(locationDatas, null, ' ');
     fs.writeFile(loggerPath, jsonData, (err) => {
       if (err){
