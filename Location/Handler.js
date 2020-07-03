@@ -32,7 +32,7 @@ module.exports = class Handler {
       LocationRepository.transferDocument("location").then(() => {
         LocationRepository.deleteAllLocation("location").then(() => {
           result += (result ? result : "") + "Location TransferDocument Success!"
-          res.send(result)
+          res.end() //resultをsendしたいがエラーが出る
         })
       })
     })

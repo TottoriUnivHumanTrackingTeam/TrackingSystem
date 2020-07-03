@@ -138,7 +138,7 @@ module.exports = class LocationRepository {
     if(applyLocation == "location"){
       loggerPath = path.join("./var/location", logName);
     }else{
-      loggerPath = path.join("./var/updatalocation", logName)
+      loggerPath = path.join("./var/updatelocation", logName)
     }
     const jsonData = JSON.stringify(locationDatas, null, ' ');
     fs.writeFile(loggerPath, jsonData, (err) => {
@@ -161,7 +161,7 @@ module.exports = class LocationRepository {
   }
   //ローカル保存のlogを必要時にDBへ押し込む(searchDateは日付)
   static async loadAndDeployJsonLocation(searchDate){
-    const loggerPath = path.join(path.dirname(__dirname), "/var/location");
+    const loggerPath = path.join(path.dirname(__dirname), "/var/updatelocation");
     const logName = searchDate + ".log"
     const jsonObject = JSON.parse(fs.readFileSync(path.join(loggerPath, logName), (err) => {
       console.log(err);

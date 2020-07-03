@@ -6,6 +6,9 @@ const Tracker = require('./Tracker');
 const LocationRepository = require('../Location/LocationRepository');
 const MapRepository = require('../Map/MapRepository');
 
+const fs = require("fs");
+const Handler = require('../Location/Handler');
+
 const DBName = process.env.DB_NAME || 'tracking';
 const DBURL = process.env.DB_URL + DBName || 'mongodb://localhost:27017/' + DBName;
 
@@ -50,10 +53,31 @@ module.exports = class TrackerRepository {
     let trackers = [];
     for (let tracker of trackerQuery) {
       if (Object.keys(searchTimes).length) {
+        function unixTime2ymd(initTime){
+          const dt = new Date(initTime)
+          const year = dt.getFullYear()
+          const month = ("00" + (dt.getMonth()+1)).slice(-2);
+          const day = ("00" + dt.getDate()).slice(-2);
+          return year+month+day
+        }
+        const searchDay = 20200718//unixTime2ymd(searchTimes["start"])
+        fs.readdir('./var/updatelocation', (err, files) => {
+          if(err){
+            console.log(err)
+          }
+          const dateList = []
+          files.forEach(file => {
+            dateList.push(file.replace(/\.[^/.]+$/, ""))
+          });
+          const searchDateList = dateList.filter(date => {
+            return searchDay >= date
+          })
+          LocationRepository.loadAndDeployJsonLocation(searchDateList[searchDateList.length - 1])
+        })
         tracker.Location = await LocationRepository.getLocationByTime(
           tracker.beaconID,
           searchTimes,
-          "updateLocation"
+          "temporaryLocation"
         );
       } else {
         tracker.Location = await LocationRepository.getLocationRecently(tracker.beaconID);
