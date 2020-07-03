@@ -7,6 +7,7 @@ const DetectorRepository = require('../Detector/DetectorRepository');
 const DetectionDataRepository = require('../DetectionData/DetectionDataRepository');
 const LocationRepository = require('../Location/LocationRepository');
 const MapRepository = require('../Map/MapRepository');
+const devkit = require('../devkit');
 
 const weightOfMedian = 2;
 const weightOfDistance = 1.8;

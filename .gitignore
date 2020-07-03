@@ -6,3 +6,4 @@ webapp/.env
 .env
 keepOutMapList.json
 dist/
+var/
