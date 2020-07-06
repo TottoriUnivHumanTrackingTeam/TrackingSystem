@@ -41,4 +41,11 @@ npm install
 node index.js
 ```
 
+TrackingSystemのルートにvarフォルダを作成し、その配下に
+detector
+location
+updatelocation
+log
+をあらかじめフォルダ作成しておいてください。
+
 実行した後に http://127.0.0.1:3000 へアクセスすればUIが表示されます。

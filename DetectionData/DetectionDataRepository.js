@@ -125,7 +125,7 @@ module.exports = class DetectionDataRepository {
   }
   //CSV読み込みの関数
   static readCsvFileData(detectorNumber) {
-    const date = "2020_6_23"//devkit.getDate2ymd(true, false);
+    const date = devkit.getDate2ymd(true, false);
     return new Promise((resolve, reject) => {
       const logName = `No${detectorNumber}_${date}.log`;
       const logPath = path.join('./var/detector', logName);
