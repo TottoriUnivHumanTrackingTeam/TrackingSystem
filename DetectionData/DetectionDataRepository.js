@@ -100,6 +100,26 @@ module.exports = class DetectionDataRepository {
       .collection("detectionData")
       .deleteMany({});
     client.close();
+    const dateTime = devkit.getDate2ymd(undefined, true);
+    const logName = dateTime + ".json"
+    const logPath = path.join('/var/log/', logName);
+    fs.unlinkSync(logPath)
     return res.result;
+  }
+
+  static async detectorLog2Json() {
+    return new Promise((resolve, reject) => {
+      let log2json = [];
+      const tasks = [];
+      for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
+        tasks.push(devkit.readCsvFileData(detectorNumber).then(result => {
+          console.log(`DetectorNo${detectorNumber} read ok`);
+          log2json = log2json.concat(result);
+        }))
+      }
+      Promise.allSettled(tasks).then(result => {
+        resolve(log2json);
+      })
+    })
   }
 };
