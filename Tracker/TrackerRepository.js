@@ -6,6 +6,8 @@ const Tracker = require('./Tracker');
 const LocationRepository = require('../Location/LocationRepository');
 const MapRepository = require('../Map/MapRepository');
 
+const devkit = require('../devkit');
+
 const DBName = process.env.DB_NAME || 'tracking';
 const DBURL = process.env.DB_URL + DBName || 'mongodb://localhost:27017/' + DBName;
 
@@ -50,10 +52,35 @@ module.exports = class TrackerRepository {
     let trackers = [];
     for (let tracker of trackerQuery) {
       if (Object.keys(searchTimes).length) {
-        tracker.Location = await LocationRepository.getLocationByTime(
-          tracker.beaconID,
-          searchTimes
-        );
+        const searchDay = devkit.getDate2ymd(searchTimes["start"]);
+        const dateNow = devkit.getDate2ymd();
+        let dateList = [];
+        if (searchDay <= dateNow - 7) {
+          dateList = await devkit.getDirectoryList('./var/updatelocation', false);
+        }
+        const searchDateList = dateList.filter(date => {
+          return searchDay >= date;
+        });
+        if (searchDateList.length) {
+          LocationRepository.loadAndDeployLocation(searchDateList[searchDateList.length - 1]);
+          tracker.Location = await LocationRepository.getLocationByTime(
+            tracker.beaconID,
+            searchTimes,
+            "temporaryLocation"
+          );
+        } else if (searchDay == dateNow) {
+          tracker.Location = await LocationRepository.getLocationByTime(
+            tracker.beaconID,
+            searchTimes,
+            "location"
+          )
+        } else {
+          tracker.Location = await LocationRepository.getLocationByTime(
+            tracker.beaconID,
+            searchTimes,
+            "updateLocation"
+          )
+        }
       } else {
         tracker.Location = await LocationRepository.getLocationRecently(tracker.beaconID);
       }

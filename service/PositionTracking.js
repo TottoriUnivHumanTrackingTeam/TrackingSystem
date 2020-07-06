@@ -13,17 +13,26 @@ const weightOfMedian = 2;
 const weightOfDistance = 1.8;
 
 module.exports = class PositionTracking {
-  static async updateLocations(calcTime) {
+  static async updateLocations(calcTime, byJson=false) {
     const allTrackers = await TrackerRepository.getAllTracker();
     const calcTimeQuery = {
       start: calcTime - 3000, //MAMORIOは6000 3秒前でデータ取得
       end: calcTime
     };
     for (let tracker of allTrackers) {
-      const detectionDatas = await DetectionDataRepository.getDetectionData(
-        tracker.beaconID,
-        calcTimeQuery
-      );
+      let detectionDatas = undefined;
+      if (byJson) {
+        detectionDatas = await DetectionDataRepository.getDetectionDataByJson(
+          tracker.beaconID,
+          calcTimeQuery,
+          devkit.getDate2ymd()
+        );
+      } else {
+        detectionDatas = await DetectionDataRepository.getDetectionData(
+          tracker.beaconID,
+          calcTimeQuery
+        );
+      }
       //console.log(detectionDatas.length); 受信データ数の表示
       if (detectionDatas.length) {
         const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber'); //受信機の番号分け
@@ -54,14 +63,57 @@ module.exports = class PositionTracking {
     }
   }
 
+  static async renewLocation() {
+    const allTrackers = await TrackerRepository.getAllTracker();
+    const allDetectionDatas = await DetectionDataRepository.detectorLog2Json();
+    const sortedAllDetectionDataByDetectedTime = _.sortBy(allDetectionDatas, 'detectedTime');
+    let startTime = Number(sortedAllDetectionDataByDetectedTime[0].detectedTime);
+    startTime = Math.floor(startTime/1000) * 1000;
+    const endTime = startTime + 86400000;
+    for (let tracker of allTrackers) {
+      while (endTime >= startTime) {
+        const calcTimeQuery = {
+          start: startTime,
+          end: startTime + 1000
+        };
+        startTime += 1000;
+        const detectionDatas = devkit.getBetweenTime(calcTimeQuery, sortedAllDetectionDataByDetectedTime);
+        if (detectionDatas.length === 0) {
+          continue;
+        }
+        const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber');
+        let fixedDetectionDatas = [];
+        for (let detectorNum in dataGroupByDetectorNum) {
+          const sortedDetectorData = _.sortBy(dataGroupByDetectorNum[detectorNum], 'RSSI');
+          let aveRSSI = 0;
+          for (let detectionData of sortedDetectorData) {
+            aveRSSI += detectionData.RSSI;
+          }
+          aveRSSI /= sortedDetectorData.length;
+          let fixedDetectionData = {
+            detectorNumber: detectorNum,
+            RSSI: aveRSSI,
+            TxPower: dataGroupByDetectorNum[detectorNum][0].TxPower,
+            numOfDataForAve: sortedDetectorData.length,
+            detectedTime: startTime
+          };
+          fixedDetectionDatas.push(fixedDetectionData);
+        }
+        const beaconAxis = await this.positionCalc(tracker.beaconID, fixedDetectionDatas);
+        LocationRepository.addLocation(beaconAxis, "updateLocation");
+      }
+    }
+  }
+
   static async positionCalc(beaconID, detectionDatas) {
     const date = new Date();
+    const time = detectionDatas[0].detectedTime; //過去のデータを参照したか
     let beaconAxis = {
       beaconID: beaconID,
       grid: { x: 0, y: 0 },
       weight: 0,
       map: '',
-      time: date.getTime()
+      time: (time ? time : date.getTime())
     };
 
     for (let detectionData of detectionDatas) {
@@ -86,7 +138,7 @@ module.exports = class PositionTracking {
     const lastLocation = await LocationRepository.getLocationByTime(beaconAxis.beaconID, { //時間が飛んだ時の取得を防ぐ
       start: beaconAxis.time - 1200,
       end: beaconAxis.time
-    });
+    }, time ? "updateLocation" : "location"); //過去の結果を参照するか
     if (lastLocation[0]) {
       beaconAxis.grid.x = parseInt((lastLocation[0].grid.x * 1.6 + beaconAxis.grid.x * 0.4) / 2); //1.6と0.4は任意で位置に重み
       beaconAxis.grid.y = parseInt((lastLocation[0].grid.y * 1.6 + beaconAxis.grid.y * 0.4) / 2); 
