@@ -45,7 +45,7 @@ module.exports = class DevelopKitFunction {
       if (err) {
         console.log(err);
       }
-      const dirList = [];
+      let dirList = [];
       if (extension) {
         return files;
       }
@@ -77,7 +77,7 @@ module.exports = class DevelopKitFunction {
     return new Promise((resolve, reject) => {
       const logName = `No${detectorNumber}_${date}.log`;
       const logPath = path.join('./var/detector', logName);
-      const tmp = [];
+      let tmp = [];
       if(!this.isExistFile(logPath)) {
         return reject();
       }

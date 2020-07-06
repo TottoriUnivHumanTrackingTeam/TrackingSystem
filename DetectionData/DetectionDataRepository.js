@@ -41,14 +41,14 @@ module.exports = class DetectionDataRepository {
   static async writeDetectionData(detectionData) {
     const dateNow = devkit.getDate2ymd();
     const logName = dateNow + ".json";
-    const logPath = path.join('./var/log/', logName);
-    if (!devkit.isExistFile(logPath)) {
-      fs.writeFile(logPath, "", (err) => {
+    const loggerPath = path.join('./var/log/', logName);
+    if (!devkit.isExistFile(loggerPath)) {
+      fs.writeFile(loggerPath, "", (err) => {
         console.log(err);
-      });
-    };
+      })
+    }
     if (detectionData !== null) {
-      fs.appendFileSync(logPath, JSON.stringify(detectionData));
+      fs.appendFileSync(loggerPath, JSON.stringify(detectionData));
     }
   }
 
@@ -84,7 +84,7 @@ module.exports = class DetectionDataRepository {
     const regex = /\]\[/g; //appendFileSyncでログデータに"]["が存在するため
     const jsonObject = JSON.parse(jsonLog.replace(regex, ","));
     const filterJson = devkit.getBetweenTime(searchTimes, jsonObject, searchBeaconID);
-    const detectionDatas = [];
+    let detectionDatas = [];
     for (let detectionData of filterJson) {
       detectionDatas.push(detectionData);
     }
@@ -110,7 +110,7 @@ module.exports = class DetectionDataRepository {
   static async detectorLog2Json() {
     return new Promise((resolve, reject) => {
       let log2json = [];
-      const tasks = [];
+      let tasks = [];
       for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
         tasks.push(devkit.readCsvFileData(detectorNumber).then(result => {
           console.log(`DetectorNo${detectorNumber} read ok`);

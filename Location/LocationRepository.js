@@ -5,6 +5,10 @@ require('dotenv').config();
 const MongoClient = require("mongodb").MongoClient;
 const Location = require("./Location");
 
+const devkit = require('../devkit');
+const path = require('path');
+const fs = require('fs');
+
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
 
@@ -109,5 +113,61 @@ module.exports = class LocationRepository {
 
     client.close();
     return locationQuery[0];
+  }
+
+  static async logTransfer(applyLocation) {
+    const client = await MongoClient.connect(DBURL).catch(err => {
+      console.log(err);
+    })
+    const db = client.db(DBName);
+    const locationDataQuery = await db
+      .collection(applyLocation)
+      .find()
+      .toArray();
+    client.close();
+    let locationDatas = [];
+    for (let locationData of locationDataQuery) {
+      locationDatas.push(locationData);
+    }
+    const dateNow = devkit.getDate2ymd();
+    const logName = dateNow + ".log";
+    let loggerPath = (applyLocation == "location") ? 
+      path.join("./var/location", logName) :
+      path.join("./var/updatelocation", logName);
+    const jsonData = JSON.stringify(locationDatas, null, ' ');
+    fs.writeFile(loggerPath, jsonData, err => {
+      if (err) {
+        console.log(err);
+      }
+    })
+  }
+
+  static async loadAndDeployLocation(searchDate) {
+    const logPath = path.join("./var/updatelocation");
+    const logName = searchDate + ".log";
+    const jsonData = JSON.parse(fs.readFileSync(path.join(logPath, logName), err => {
+      console.log(err);
+    }))
+    const client = await MongoClient.connect(DBURL).catch(err => {
+      console.log(err);
+    })
+    const db = client.db(DBName);
+    const res = await db
+      .collection("temporaryLocation")
+      .insertMany(jsonData);
+    client.close();
+    return res.result;
+  }
+
+  static async deleteLocation(applyLocation) {
+    const client = await MongoClient.connect(DBURL).catch(err => {
+      console.log(err);
+    })
+    const db = client.db(DBName);
+    const res = await db
+      .collection(applyLocation)
+      .deleteMany({});
+    client.close();
+    return res.result;
   }
 };
