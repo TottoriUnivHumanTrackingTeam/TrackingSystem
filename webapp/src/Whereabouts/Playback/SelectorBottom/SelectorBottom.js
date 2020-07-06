@@ -22,6 +22,7 @@ export default function PlaybackSelectorBottom(props) {
     times.reverse();
     setTimeLine(times);
     //プレイバック機能のデータ飛び時の再生停止機能
+    //24時間分を超えると処理に時間がかかる
     const errTimeLocation = _.map(largestLocationTracker.Location, location => {
       if(location.alert){
         return location.locatedTime;
