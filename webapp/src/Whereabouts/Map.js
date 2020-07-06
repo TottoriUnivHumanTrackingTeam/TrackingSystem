@@ -60,6 +60,17 @@ export default function sketch(p) {
             );
             p.tint('red');
             p.image(tracker.image, tracker.Location.grid.x, tracker.Location.grid.y);
+          }else if(tracker.Location.alert){
+            p.textSize(20);
+            p.fill(p.color('red'));
+            p.textAlign(p.LEFT, p.TOP);
+            p.text(
+              tracker.trackerName + 'さんを見失いました！',
+              tracker.Location.grid.x + 30,
+              tracker.Location.grid.y + 30
+            );
+            p.tint('red');
+            p.image(tracker.image, tracker.Location.grid.x, tracker.Location.grid.y);
           } else {
             p.noTint();
             p.image(tracker.image, tracker.Location.grid.x, tracker.Location.grid.y);

@@ -46,8 +46,14 @@ module.exports = class LocationRepository {
     client.close();
     let locations = [];
     for (let location of locationQuery) {
+      location.alert = false;
       locations.push(location);
     }
+    locations.forEach((location, idx) => {
+      if(locations[idx+1] && locations[idx].locatedTime - 15000 > locations[idx+1].locatedTime){
+        locations[idx+1].alert = true;
+      }
+    });
     return locations;
   }
 
