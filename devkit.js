@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const path = require('path')
-const readline = require('readline');
 
 module.exports = class DevelopKitFunction {
   //ファイルの有無確認
@@ -39,27 +38,23 @@ module.exports = class DevelopKitFunction {
     }
   }
   //dir内のファイルを一覧にして表示(extensionがfalseで拡張子を非表示)
-  static getDirectoryList(dir, extension=true) {
-    fs.readdir(dir, (err, files) => {
-      const regex = /\.[^/.]+$/;
-      if (err) {
-        console.log(err);
-      }
-      let dirList = [];
-      if (extension) {
-        return files;
-      }
-      files.forEach(file => {
-        dirList.push(file.replace(regex, ""))
-      })
-      return dirList;
+  static async getDirectoryList(dir, extension=true) {
+    const fileList = fs.readdirSync(dir);
+    const regex = /\.[^/.]+$/;
+    if (extension) {
+      return files;
+    }
+    let dirList = [];
+    fileList.forEach(file => {
+      dirList.push(file.replace(regex, ""))
     })
+    return dirList;
   }
   //時間内データのフィルタリング
-  static getBetweenTime(searchTimes, objects, searchBeaconID) {
+  static getBetweenTime(searchTimesQuery, objects, searchBeaconID) {
     const filtered = objects.filter(object => {
-      const startBoolean = (Number(object.detectedTime) >= Number(searchTimes.start));
-      const endBoolean = (Number(object.detectedTime) <= Number(searchTimes.end));
+      const startBoolean = (Number(object.detectedTime) >= Number(searchTimesQuery.start));
+      const endBoolean = (Number(object.detectedTime) <= Number(searchTimesQuery.end));
       if (startBoolean && endBoolean) {
         if (searchBeaconID){
           if (object.beaconID === searchBeaconID) {
@@ -70,33 +65,5 @@ module.exports = class DevelopKitFunction {
       }
     })
     return filtered;
-  }
-  //CSV読み込みの関数(特に何かない限りcsvFilePadding, yesterdayは常にfalse, true)
-  static async readCsvFileData(detectorNumber, csvFilePadding=false, yesterday=true) {
-    const date = `2020_6_23`;//this.getDate2ymd(yesterday, csvFilePadding);
-    return new Promise((resolve, reject) => {
-      const logName = `No${detectorNumber}_${date}.log`;
-      const logPath = path.join('./var/detector', logName);
-      let tmp = [];
-      if(!this.isExistFile(logPath)) {
-        return reject();
-      }
-      const rs = fs.createReadStream(logPath);
-      const rl = readline.createInterface(rs, {});
-      rl.on('line', line => {
-        const contents = line.split(",");
-        const jsonObj = {
-          "detectorNumber": Number(contents[0]),
-          "RSSI": Number(contents[3]),
-          "TxPower": Number(contents[2]),
-          "beaconID": contents[1],
-          "detectedTime": contents[4]
-        }
-        tmp.push(jsonObj);
-      });
-      rl.on('close', () => {
-        return resolve(tmp);
-      });
-    })
   }
 }

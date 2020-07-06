@@ -9,6 +9,7 @@ const DetectionData = require("./DetectionData");
 const devkit = require('../devkit');
 const path = require('path');
 const fs = require('fs');
+const readline = require('readline');
 
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
@@ -112,7 +113,7 @@ module.exports = class DetectionDataRepository {
       let log2json = [];
       let tasks = [];
       for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
-        tasks.push(devkit.readCsvFileData(detectorNumber).then(result => {
+        tasks.push(this.readCsvFileData(detectorNumber).then(result => {
           console.log(`DetectorNo${detectorNumber} read ok`);
           log2json = log2json.concat(result);
         }))
@@ -120,6 +121,34 @@ module.exports = class DetectionDataRepository {
       Promise.allSettled(tasks).then(result => {
         resolve(log2json);
       })
+    })
+  }
+  //CSV読み込みの関数
+  static readCsvFileData(detectorNumber) {
+    const date = "2020_6_23"//devkit.getDate2ymd(true, false);
+    return new Promise((resolve, reject) => {
+      const logName = `No${detectorNumber}_${date}.log`;
+      const logPath = path.join('./var/detector', logName);
+      let tmp = [];
+      if(!devkit.isExistFile(logPath)) {
+        return reject();
+      }
+      const rs = fs.createReadStream(logPath);
+      const rl = readline.createInterface(rs, {});
+      rl.on('line', line => {
+        const contents = line.split(",");
+        const jsonObj = {
+          "detectorNumber": Number(contents[0]),
+          "RSSI": Number(contents[3]),
+          "TxPower": Number(contents[2]),
+          "beaconID": contents[1],
+          "detectedTime": contents[4]
+        }
+        tmp.push(jsonObj);
+      });
+      rl.on('close', () => {
+        return resolve(tmp);
+      });
     })
   }
 };
