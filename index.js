@@ -17,6 +17,13 @@ const MetaRouter = require('./Meta/Router');
 const TrackerRouter = require('./Tracker/Router');
 const ScheduleRouter = require('./Schedule/Router');
 
+const LocationCron = require("./Location/cron");
+const ServiceCron = require("./service/cron");
+
+LocationCron.day.start();
+LocationCron.week.start();
+ServiceCron.start();
+
 const app = express();
 
 app.use(cors());

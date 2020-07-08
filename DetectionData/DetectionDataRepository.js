@@ -28,7 +28,6 @@ module.exports = class DetectionDataRepository {
         )
       );
     });
-
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
@@ -129,7 +128,7 @@ module.exports = class DetectionDataRepository {
   }
   //CSV読み込みの関数
   static readCsvFileData(detectorNumber) {
-    const date = devkit.getDate2ymd(true, false);
+    const date = devkit.getDate2ymd(null, true, false); //デバッグ時マジックナンバーが必要
     return new Promise((resolve, reject) => {
       const logName = `No${detectorNumber}_${date}.log`;
       const logPath = path.join('./var/detector', logName);

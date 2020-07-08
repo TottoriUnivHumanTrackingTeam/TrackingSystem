@@ -17,4 +17,12 @@ module.exports = class Handler {
         res.send(locations);
       });
   }
+
+  static logMakeAndDelete(locationType) {
+    LocationRepository.logTransfer(locationType).then(() => {
+      LocationRepository.deleteLocation(locationType).then(() => {
+        console.log("Location Log Success!");
+      })
+    })
+  }
 };

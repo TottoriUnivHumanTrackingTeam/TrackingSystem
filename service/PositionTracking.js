@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require('underscore');
-const fs = require('fs');
 const TrackerRepository = require('../Tracker/TrackerRepository');
 const DetectorRepository = require('../Detector/DetectorRepository');
 const DetectionDataRepository = require('../DetectionData/DetectionDataRepository');
