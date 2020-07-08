@@ -17,7 +17,6 @@ export default function MaterialUIPickers(props) {
       start: startDate.getTime(),
       end: endDate.getTime()
     };
-    console.log(term);
     props.onSend(term);
   };
 
