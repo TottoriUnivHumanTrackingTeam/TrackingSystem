@@ -7,42 +7,26 @@ import { DatePicker, TimePicker, MuiPickersUtilsProvider } from '@material-ui/pi
 
 export default function MaterialUIPickers(props) {
   const [selectDate, setSelectDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime,setEndTime] = useState(new Date());
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
   const send = () => {
     const term = {
       start: startDate.getTime(),
-      end: endDate.getTime()
+      end: endDate
     };
     props.onSend(term);
   };
 
   useEffect(() => {
-    const selectStartDate = new Date();
-    selectStartDate.setFullYear(selectDate.getFullYear());
-    selectStartDate.setMonth(selectDate.getMonth());
-    selectStartDate.setDate(selectDate.getDate());
-    selectStartDate.setHours(startTime.getHours());
-    selectStartDate.setMinutes(startTime.getMinutes());
-    selectStartDate.setSeconds(startTime.getSeconds());
-    selectStartDate.setMilliseconds(startTime.getMilliseconds());
-    setStartDate(selectStartDate);
-  }, [selectDate, startTime]);
-
-  useEffect(() => {
-    const selectEndDate = new Date();
-    selectEndDate.setFullYear(selectDate.getFullYear());
-    selectEndDate.setMonth(selectDate.getMonth());
-    selectEndDate.setDate(selectDate.getDate());
-    selectEndDate.setHours(endTime.getHours());
-    selectEndDate.setMinutes(endTime.getMinutes());
-    selectEndDate.setSeconds(endTime.getSeconds());
-    selectEndDate.setMilliseconds(endTime.getMilliseconds());
-    setEndDate(selectEndDate);
-  }, [selectDate, endTime]);
+    startDate.setFullYear(selectDate.getFullYear());
+    startDate.setMonth(selectDate.getMonth());
+    startDate.setDate(selectDate.getDate());
+    startDate.setHours(0, 0, 0, 0);
+    setStartDate(startDate);
+    const endDate = startDate.getTime() + 86399999;
+    setEndDate(endDate);
+  }, [selectDate]);
 
   useEffect(send, [endDate]);
 
@@ -55,31 +39,9 @@ export default function MaterialUIPickers(props) {
           format="yyyy/MM/dd"
           value={selectDate}
           onChange={date => {
+            console.log(date);
             setSelectDate(date);
           }}
-        />
-      </Grid>
-      <br />
-      <Grid container justify="space-around">
-        <TimePicker
-          variant="inline"
-          label="開始時間"
-          format="HH:mm"
-          value={startTime}
-          onChange={date => {
-            setStartTime(date);
-            setEndTime(date);
-          }}
-        />
-      </Grid>
-      <br />
-      <Grid container justify="space-around">
-        <TimePicker
-          variant="inline"
-          label="終了時間"
-          format="HH:mm"
-          value={endTime}
-          onChange={date => setEndTime(date)}
         />
       </Grid>
     </MuiPickersUtilsProvider>
