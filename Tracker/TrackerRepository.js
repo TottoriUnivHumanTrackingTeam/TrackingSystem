@@ -61,26 +61,21 @@ module.exports = class TrackerRepository {
         const searchDateList = dateList.filter(date => {
           return searchDay >= date;
         });
+        const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
+        let locationType = "";
         if (searchDateList.length) {
           LocationRepository.loadAndDeployLocation(searchDateList[searchDateList.length - 1]);
-          tracker.Location = await LocationRepository.getLocationByTime(
-            tracker.beaconID,
-            searchTimes,
-            "temporaryLocation"
-          );
+          locationType = locationTypeArray[0];
         } else if (searchDay == dateNow) {
-          tracker.Location = await LocationRepository.getLocationByTime(
-            tracker.beaconID,
-            searchTimes,
-            "location"
-          )
+          locationType = locationTypeArray[1];
         } else {
-          tracker.Location = await LocationRepository.getLocationByTime(
-            tracker.beaconID,
-            searchTimes,
-            "updateLocation"
-          )
+          locationType = locationTypeArray[2];
         }
+        tracker.Location = await LocationRepository.getLocationByTime(
+          tracker.beaconID,
+          searchTimes,
+          locationType
+        );
       } else {
         tracker.Location = await LocationRepository.getLocationRecently(tracker.beaconID);
       }
@@ -97,7 +92,7 @@ module.exports = class TrackerRepository {
     const searchQuery = { beaconID: searchedBeaconID };
     const tracker = await db.collection('tracker').findOne(searchQuery);
     if (Object.keys(times).length) {
-      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times);
+      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times, "location");
       tracker.Location = locations;
     } else {
       const locations = await LocationRepository.getLocationRecently(tracker.beaconID);
@@ -116,7 +111,7 @@ module.exports = class TrackerRepository {
     const tracker = await db.collection('tracker').findOne(searchQuery);
     client.close();
     if (Object.keys(times).length) {
-      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times);
+      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times, "location");
       tracker.Location = locations;
     } else {
       const locations = await LocationRepository.getLocationRecently(tracker.beaconID);

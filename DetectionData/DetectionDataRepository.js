@@ -53,7 +53,11 @@ module.exports = class DetectionDataRepository {
     }
   }
 
-  static async getDetectionData(searchBeaconID, searchTimes) {
+  static async getDetectionData(searchBeaconID, searchTimes, byJson) {
+    if (byJson) {
+      const dateNow = devkit.getDate2ymd();
+      return this.getDetectionDataByJson(searchBeaconID, searchTimes, dateNow);
+    }
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });

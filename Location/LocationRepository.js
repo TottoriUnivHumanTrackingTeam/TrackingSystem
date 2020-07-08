@@ -13,7 +13,7 @@ const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
 
 module.exports = class LocationRepository {
-  static async addLocation(putLocation, insertLocation="location") {
+  static async addLocation(putLocation, insertLocation) {
     const location = new Location(
       putLocation["beaconID"],
       putLocation["grid"],
@@ -110,7 +110,6 @@ module.exports = class LocationRepository {
       .sort({ locatedTime: -1 })
       .limit(1)
       .toArray();
-
     client.close();
     return locationQuery[0];
   }

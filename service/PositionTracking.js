@@ -20,19 +20,11 @@ module.exports = class PositionTracking {
       end: calcTime
     };
     for (let tracker of allTrackers) {
-      let detectionDatas = undefined;
-      if (byJson) {
-        detectionDatas = await DetectionDataRepository.getDetectionDataByJson(
-          tracker.beaconID,
-          calcTimeQuery,
-          devkit.getDate2ymd()
-        );
-      } else {
-        detectionDatas = await DetectionDataRepository.getDetectionData(
-          tracker.beaconID,
-          calcTimeQuery
-        );
-      }
+      let detectionDatas = await DetectionDataRepository.getDetectionData(
+        tracker.beaconID,
+        calcTimeQuery,
+        byJson
+      );
       //console.log(detectionDatas.length); 受信データ数の表示
       if (detectionDatas.length) {
         const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber'); //受信機の番号分け
@@ -58,7 +50,7 @@ module.exports = class PositionTracking {
           fixedDetectionDatas.push(fixedDetectionData);
         }
         const beaconAxis = await this.positionCalc(tracker.beaconID, fixedDetectionDatas);
-        LocationRepository.addLocation(beaconAxis);
+        LocationRepository.addLocation(beaconAxis, "location");
       }
     }
   }
