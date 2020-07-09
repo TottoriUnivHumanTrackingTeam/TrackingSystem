@@ -7,6 +7,7 @@ const DetectionDataRepository = require('../DetectionData/DetectionDataRepositor
 const LocationRepository = require('../Location/LocationRepository');
 const MapRepository = require('../Map/MapRepository');
 const devkit = require('../devkit');
+const path = require('path');
 
 const weightOfMedian = 2;
 const weightOfDistance = 1.8;
@@ -55,6 +56,17 @@ module.exports = class PositionTracking {
   }
 
   static async renewLocation() {
+    const dateYesterday = devkit.getDate2ymd(null, true, false);
+    for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
+      const logName = `No${detectorNumber}_${dateYesterday}.log`;
+      const logPath = path.join("./var/detector", logName);
+      const exist = devkit.isExistFile(logPath);
+      if (exist) {
+        continue;
+      } else {
+        throw new Error();
+      }
+    }
     const allTrackers = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await DetectionDataRepository.detectorLog2Json();
     const sortedAllDetectionDataByDetectedTime = _.sortBy(allDetectionDatas, 'detectedTime');
