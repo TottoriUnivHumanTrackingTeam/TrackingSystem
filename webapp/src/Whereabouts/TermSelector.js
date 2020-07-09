@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import jaLocale from 'date-fns/locale/ja';
 import 'date-fns';
-import { DatePicker, TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 export default function MaterialUIPickers(props) {
   const [selectDate, setSelectDate] = useState(new Date());
@@ -39,7 +39,6 @@ export default function MaterialUIPickers(props) {
           format="yyyy/MM/dd"
           value={selectDate}
           onChange={date => {
-            console.log(date);
             setSelectDate(date);
           }}
         />
