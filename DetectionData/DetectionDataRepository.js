@@ -99,7 +99,7 @@ module.exports = class DetectionDataRepository {
     const client = await MongoClient.connect(DBURL).catch((err) => {
       console.log(err);
     })
-    const db = client.detectedTime(DBName);
+    const db = client.db(DBName);
     const res = await db
       .collection("detectionData")
       .deleteMany({});
@@ -153,5 +153,9 @@ module.exports = class DetectionDataRepository {
         return resolve(tmp);
       });
     })
+  }
+
+  static async uploadData2Server(uploadData) {
+    console.log(uploadData);
   }
 };

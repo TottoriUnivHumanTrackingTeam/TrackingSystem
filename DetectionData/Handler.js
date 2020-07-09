@@ -9,4 +9,10 @@ module.exports = class Handler {
       res.send("DetectionData Add Success!");
     });
   }
+
+  static uploadData2Server(req, res) {
+    DetectionDataRepository.uploadData2Server(req.file).then(() => {
+      res.send("Upload Success!");
+    })
+  }
 };
