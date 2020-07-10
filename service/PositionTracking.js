@@ -20,7 +20,7 @@ module.exports = class PositionTracking {
       end: calcTime
     };
     for (let tracker of allTrackers) {
-      let detectionDatas = await DetectionDataRepository.getDetectionData(
+      const detectionDatas = await DetectionDataRepository.getDetectionData(
         tracker.beaconID,
         calcTimeQuery,
         byJson

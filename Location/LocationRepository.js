@@ -110,6 +110,7 @@ module.exports = class LocationRepository {
       .sort({ locatedTime: -1 })
       .limit(1)
       .toArray();
+      
     client.close();
     return locationQuery[0];
   }
