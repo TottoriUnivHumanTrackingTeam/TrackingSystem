@@ -42,12 +42,12 @@ module.exports = class DetectionDataRepository {
     const dateNow = devkit.getDate2ymd();
     const logName = dateNow + ".json";
     const loggerPath = path.join('./var/log/', logName);
-    if (!devkit.isExistFile(loggerPath)) {
+    if (devkit.isNotExistFile(loggerPath)) {
       fs.writeFile(loggerPath, "", (err) => {
         console.log(err);
       })
     }
-    if (detectionData !== null) {
+    if (devkit.isNotEmpty(detectionData)) {
       fs.appendFileSync(loggerPath, JSON.stringify(detectionData));
     }
   }
@@ -55,8 +55,14 @@ module.exports = class DetectionDataRepository {
   static async getDetectionData(searchBeaconID, searchTimes, byJson) {
     if (byJson) {
       const dateNow = devkit.getDate2ymd();
-      return this.getDetectionDataByJson(searchBeaconID, searchTimes, dateNow);
+      const detectionDatas = this.getDetectionDataByJson(searchBeaconID, searchTimes, dateNow);
+      console.log("getDetectionData : JSON")
+      if (devkit.isNotEmpty(detectionDatas)) {
+        return detectionDatas;
+      }
+      console.log("getDetectionData : MongoDB");
     }
+    console.log("getDetectionData : MongoDB")
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
@@ -84,6 +90,9 @@ module.exports = class DetectionDataRepository {
   static async getDetectionDataByJson(searchBeaconID, searchTimes, dateTime) {
     const logName = dateTime + ".json";
     const logPath = path.join('./var/log/', logName);
+    if (devkit.isNotExistFile(logPath)) {
+      return null;
+    }
     const jsonLog = fs.readFileSync(logPath, 'utf-8');
     const regex = /\]\[/g; //appendFileSyncでログデータに"]["が存在するため
     const jsonObject = JSON.parse(jsonLog.replace(regex, ","));
@@ -133,7 +142,7 @@ module.exports = class DetectionDataRepository {
       const logName = `No${detectorNumber}_${date}.log`;
       const logPath = path.join('./var/detector', logName);
       let tmp = [];
-      if(!devkit.isExistFile(logPath)) {
+      if(devkit.isNotExistFile(logPath)) {
         return reject();
       }
       const rs = fs.createReadStream(logPath);
