@@ -28,7 +28,7 @@ module.exports = class DetectionDataRepository {
         )
       );
     });
-    
+
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
