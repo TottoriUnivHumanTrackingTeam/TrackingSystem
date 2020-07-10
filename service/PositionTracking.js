@@ -26,7 +26,7 @@ module.exports = class PositionTracking {
         byJson
       );
       //console.log(detectionDatas.length); 受信データ数の表示
-      if (detectionDatas.length) {
+      if (devkit.isNotEmpty(detectionDatas)) {
         const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber'); //受信機の番号分け
         let fixedDetectionDatas = [];
         for (let detectorNum in dataGroupByDetectorNum) {
@@ -60,8 +60,7 @@ module.exports = class PositionTracking {
     for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
       const logName = `No${detectorNumber}_${dateYesterday}.log`;
       const logPath = path.join("./var/detector", logName);
-      const exist = devkit.isExistFile(logPath);
-      if (exist) {
+      if (devkit.isExistFile(logPath)) {
         continue;
       } else {
         throw new Error();
@@ -81,7 +80,7 @@ module.exports = class PositionTracking {
         };
         startTime += 1000;
         const detectionDatas = devkit.getBetweenTime(calcTimeQuery, sortedAllDetectionDataByDetectedTime);
-        if (detectionDatas.length === 0) {
+        if (devkit.isEmpty(detectionDatas)) {
           continue;
         }
         const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber');

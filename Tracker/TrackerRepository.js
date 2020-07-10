@@ -63,7 +63,7 @@ module.exports = class TrackerRepository {
         });
         const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
         let locationType = "";
-        if (searchDateList.length) {
+        if (devkit.isNotEmpty(searchDateList)) {
           LocationRepository.loadAndDeployLocation(searchDateList[searchDateList.length - 1]);
           locationType = locationTypeArray[0];
         } else if (searchDay == dateNow) {
