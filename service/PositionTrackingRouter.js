@@ -4,7 +4,7 @@ const Handler = require('./PositionTrackingHandlers');
 const express = require('express');
 const router = express.Router();
 
-  router.get('/start', (request, response) => {
+  router.post('/start', (request, response) => {
     Handler.startPositionTracking(request, response)
   });
 

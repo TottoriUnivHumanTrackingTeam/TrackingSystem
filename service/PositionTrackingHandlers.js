@@ -8,8 +8,9 @@ let timerID;
 
 module.exports = class PositionTrackingHandlers {
   static startPositionTracking(req, res) {
+    clearInterval(timerID);
     timerID = setInterval(() => {
-      const byJson = devkit.isNotEmpty(req.body) ? req.body : false;
+      const byJson = req.body.select === "json" ? req.body : false;
       const date = new Date();
       const startTime = date.getTime() - 3000; //3秒前のデータでロケーションをアップデート
       PositionTracking.updateLocations(startTime, byJson);
