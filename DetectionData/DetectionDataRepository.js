@@ -131,7 +131,7 @@ module.exports = class DetectionDataRepository {
           log2json = log2json.concat(result);
         }))
       }
-      Promise.allSettled(tasks).then(result => {
+      Promise.all(tasks).then(result => {
         resolve(log2json);
       })
     })
