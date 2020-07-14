@@ -125,13 +125,17 @@ module.exports = class DetectionDataRepository {
       let log2json = [];
       let tasks = [];
       console.log("detectorLog2Json: Read");
-      for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
-        tasks.push(this.readCsvFileData(detectorNumber).then(result => {
+      for (let detectorNumber = 1; detectorNumber <= 5; detectorNumber++) { //個数を指定する
+        tasks.push(this.readCsvFileData(detectorNumber).catch(() => {
+          return reject(`detectorLog2Json: DetectorNo${detectorNumber} cant task push`);
+        }).then(result => {
           console.log(`DetectorNo${detectorNumber} read ok`);
           log2json = log2json.concat(result);
         }))
       }
-      Promise.all(tasks).then(result => {
+      Promise.all(tasks).catch(() => {
+        return reject(`detectorLog2Json: DetectorNo${detectorNumber} reject`)
+      }).then(result => {
         resolve(log2json);
       })
     })

@@ -50,4 +50,6 @@ log
 ```
 をあらかじめフォルダ作成しておいてください。
 
+PositionTracking.jsとDetectionDataRepository.jsに受信機個数を指定しておく。
+
 実行した後に http://127.0.0.1:3000 へアクセスすればUIが表示されます。

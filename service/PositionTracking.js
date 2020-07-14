@@ -58,17 +58,13 @@ module.exports = class PositionTracking {
   static async renewLocation() {
     console.log("renewLocation: process")
     const dateYesterday = devkit.getDate2ymd(null, true, false);
-    for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
+    for (let detectorNumber = 1; detectorNumber <= 5; detectorNumber++) { //個数を指定する
       const logName = `No${detectorNumber}_${dateYesterday}.log`;
       const logPath = path.join("./var/detector", logName);
       if (devkit.isExistFile(logPath)) {
         continue;
       } else {
-        let debug = true;
-        if (debug) {
-          continue;
-        }
-        throw new Error(`${logName} isnt exist`);
+        return new Promise.reject(`${logName} isnt exist`);
       }
     }
     const allTrackers = await TrackerRepository.getAllTracker();
