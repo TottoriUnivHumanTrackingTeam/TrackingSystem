@@ -64,7 +64,7 @@ module.exports = class PositionTracking {
       if (devkit.isExistFile(logPath)) {
         continue;
       } else {
-        return new Promise.reject(`${logName} isnt exist`);
+        return Promise.reject(`${logName} isnt exist`);
       }
     }
     const allTrackers = await TrackerRepository.getAllTracker();

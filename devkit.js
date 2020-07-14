@@ -40,6 +40,15 @@ module.exports = class DevelopKitFunction {
   static isNotExistFile(file) {
     return !this.isExistFile(file);
   }
+  //ファイルの削除
+  static deleteFile(path){
+    try {
+      fs.unlinkSync(path);
+      return true;
+    } catch(err) {
+      return false;
+    }
+  }
   //日付取得(initTimeはUnixTimeから変換, yesterdayがtrueで前日, paddingがtrueで0埋め, falseで'_'区切りの日付)
   static getDate2ymd(initTime, yesterday=false, padding=true){
     let dt = undefined;

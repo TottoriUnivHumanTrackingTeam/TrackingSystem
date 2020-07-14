@@ -115,7 +115,7 @@ module.exports = class DetectionDataRepository {
     const dateTime = devkit.getDate2ymd(undefined, true);
     const logName = dateTime + ".json"
     const logPath = path.join('/var/log/', logName);
-    fs.unlinkSync(logPath)
+    devkit.deleteFile(logPath);
     console.log("deleteDetectionData: LogData")
     return res.result;
   }
