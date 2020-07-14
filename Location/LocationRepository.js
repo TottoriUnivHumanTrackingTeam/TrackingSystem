@@ -129,6 +129,7 @@ module.exports = class LocationRepository {
     for (let locationData of locationDataQuery) {
       locationDatas.push(locationData);
     }
+    console.log("logTransfer: DataRead");
     const dateNow = devkit.getDate2ymd();
     const logName = dateNow + ".log";
     let loggerPath = (applyLocation == "location") ? 
@@ -140,9 +141,11 @@ module.exports = class LocationRepository {
         console.log(err);
       }
     })
+    console.log("logTransfer: Written")
   }
 
   static async loadAndDeployLocation(searchDate) {
+    console.log("loadAndDeployLocation: process")
     const logPath = path.join("./var/updatelocation");
     const logName = searchDate + ".log";
     const jsonData = JSON.parse(fs.readFileSync(path.join(logPath, logName), err => {
@@ -156,10 +159,12 @@ module.exports = class LocationRepository {
       .collection("temporaryLocation")
       .insertMany(jsonData);
     client.close();
+    console.log("loadAndDeployLocation: deployed")
     return res.result;
   }
 
   static async deleteLocation(applyLocation) {
+    console.log("deleteLocation: DB")
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     })

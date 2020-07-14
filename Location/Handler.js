@@ -19,8 +19,11 @@ module.exports = class Handler {
   }
 
   static logMakeAndDelete(locationType) {
+    console.log(`logMakeAndDelete: ${locationType}`)
     LocationRepository.logTransfer(locationType).then(() => {
+      console.log("logTransfer: done")
       LocationRepository.deleteLocation(locationType).then(() => {
+        console.log("deleteLocation: done")
         console.log("Location Log Success!");
       })
     })

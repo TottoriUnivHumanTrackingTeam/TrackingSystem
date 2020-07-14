@@ -57,13 +57,10 @@ module.exports = class DetectionDataRepository {
     if (byJson) {
       const dateNow = devkit.getDate2ymd();
       const detectionDatas = this.getDetectionDataByJson(searchBeaconID, searchTimes, dateNow);
-      console.log("getDetectionData : JSON")
       if (devkit.isNotEmpty(detectionDatas)) {
         return detectionDatas;
       }
-      console.log("getDetectionData : MongoDB");
     }
-    console.log("getDetectionData : MongoDB")
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
@@ -114,10 +111,12 @@ module.exports = class DetectionDataRepository {
       .collection("detectionData")
       .deleteMany({});
     client.close();
+    console.log("deleteDetectionData: DB");
     const dateTime = devkit.getDate2ymd(undefined, true);
     const logName = dateTime + ".json"
     const logPath = path.join('/var/log/', logName);
     fs.unlinkSync(logPath)
+    console.log("deleteDetectionData: LogData")
     return res.result;
   }
 
@@ -127,6 +126,7 @@ module.exports = class DetectionDataRepository {
       let tasks = [];
       for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
         tasks.push(this.readCsvFileData(detectorNumber).then(result => {
+          console.log("detectorLog2Json: Read");
           console.log(`DetectorNo${detectorNumber} read ok`);
           log2json = log2json.concat(result);
         }))
@@ -138,6 +138,7 @@ module.exports = class DetectionDataRepository {
   }
   //CSV読み込みの関数
   static readCsvFileData(detectorNumber) {
+    console.log("readCsvFileData: Reading");
     const date = devkit.getDate2ymd(null, true, false); //デバッグ時マジックナンバーが必要
     return new Promise((resolve, reject) => {
       const logName = `No${detectorNumber}_${date}.log`;
@@ -166,6 +167,6 @@ module.exports = class DetectionDataRepository {
   }
 
   static async uploadData2Server(uploadData) {
-    console.log(uploadData);
+    console.log(`uploadData2Server: ${uploadData.originalname}`);
   }
 };

@@ -11,10 +11,6 @@ export default function DataSelector(props) {
         .catch((err) => {console.log(err)})
   }
 
-  useCallback(() => {
-    startTracking();
-  }, [select]);
-
   const handleChange = (event) => {
     setSelect(event.target.value);
   }

@@ -25,8 +25,11 @@ module.exports = class PositionTrackingHandlers {
   }
 
   static updateYesterdayPositionTracking() {
+    console.log("updateYesterdayPositionTracking: start")
     PositionTracking.renewLocation().then(() => {
+      console.log("renewLocation: done")
       DetectionDataRepository.deleteDetectionData().then(() => {
+        console.log("deleteDetectionData: done")
         res.send("RenewLocationData Success!");
       })
     })

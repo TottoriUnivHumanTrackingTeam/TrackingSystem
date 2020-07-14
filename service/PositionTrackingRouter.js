@@ -13,6 +13,7 @@ const router = express.Router();
   });
 
   router.put('/log', (request, response) => {
+    console.log("access to tracking/log");
     Handler.updateYesterdayPositionTracking(request, response);
   })
 

@@ -56,6 +56,7 @@ module.exports = class PositionTracking {
   }
 
   static async renewLocation() {
+    console.log("renewLocation: process")
     const dateYesterday = devkit.getDate2ymd(null, true, false);
     for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
       const logName = `No${detectorNumber}_${dateYesterday}.log`;
@@ -63,7 +64,11 @@ module.exports = class PositionTracking {
       if (devkit.isExistFile(logPath)) {
         continue;
       } else {
-        throw new Error();
+        let debug = true;
+        if (debug) {
+          continue;
+        }
+        throw new Error(`${logName} isnt exist`);
       }
     }
     const allTrackers = await TrackerRepository.getAllTracker();
@@ -72,6 +77,7 @@ module.exports = class PositionTracking {
     let startTime = Number(sortedAllDetectionDataByDetectedTime[0].detectedTime);
     startTime = Math.floor(startTime/1000) * 1000;
     const endTime = startTime + 86400000;
+    console.log("renewLocation: doing")
     for (let tracker of allTrackers) {
       while (endTime >= startTime) {
         const calcTimeQuery = {
