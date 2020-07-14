@@ -124,9 +124,9 @@ module.exports = class DetectionDataRepository {
     return new Promise((resolve, reject) => {
       let log2json = [];
       let tasks = [];
+      console.log("detectorLog2Json: Read");
       for (let detectorNumber = 1; detectorNumber <= 25; detectorNumber++) {
         tasks.push(this.readCsvFileData(detectorNumber).then(result => {
-          console.log("detectorLog2Json: Read");
           console.log(`DetectorNo${detectorNumber} read ok`);
           log2json = log2json.concat(result);
         }))
@@ -138,7 +138,6 @@ module.exports = class DetectionDataRepository {
   }
   //CSV読み込みの関数
   static readCsvFileData(detectorNumber) {
-    console.log("readCsvFileData: Reading");
     const date = devkit.getDate2ymd(null, true, false); //デバッグ時マジックナンバーが必要
     return new Promise((resolve, reject) => {
       const logName = `No${detectorNumber}_${date}.log`;
@@ -147,6 +146,7 @@ module.exports = class DetectionDataRepository {
       if(devkit.isNotExistFile(logPath)) {
         return reject();
       }
+      console.log("readCsvFileData: Reading");
       const rs = fs.createReadStream(logPath);
       const rl = readline.createInterface(rs, {});
       rl.on('line', line => {
