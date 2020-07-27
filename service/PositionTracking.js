@@ -70,7 +70,7 @@ module.exports = class PositionTracking {
           end: startTime + 1000
         };
         startTime += 1000;
-        const detectionDatas = devkit.getBetweenTime(calcTimeQuery, sortedAllDetectionDataByDetectedTime);
+        const detectionDatas = devkit.getBetweenTime(calcTimeQuery, allDetectionDatas);
         if (devkit.isEmpty(detectionDatas)) {
           continue;
         }

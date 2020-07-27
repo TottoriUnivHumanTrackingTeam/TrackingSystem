@@ -10,6 +10,7 @@ const devkit = require('../devkit');
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
+const TrackerRepository = require('../Tracker/TrackerRepository');
 
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
@@ -148,36 +149,40 @@ module.exports = class DetectionDataRepository {
   //中間ファイル作成
   static async intermediateFile(detectorNumber) {
     console.log("intermediateFile: process");
+    const allTracker = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await this.readCsvFileData(detectorNumber)
     let startTime = Number(allDetectionDatas[0].detectedTime);
     startTime = Math.floor(startTime/1000) * 1000;
     const endTime = startTime + 86400000;
     const fixedDetectionDatas = [];
-    while(endTime >= startTime) {
-      const calcTimeQuery = {
-        start: startTime,
-        end: startTime + 1000
-      };
-      startTime += 1000;
-      const detectionDatas = devkit.getBetweenTime(calcTimeQuery, allDetectionDatas);
-      if (devkit.isEmpty(detectionDatas)) {
-        continue;
+    const dataGroupByBeaconID = _.groupBy(allDetectionDatas, "BeaconID");
+    for(let beaconID of dataGroupByBeaconID) {
+      while(endTime >= startTime) {
+        const calcTimeQuery = {
+          start: startTime,
+          end: startTime + 1000
+        };
+        startTime += 1000;
+        const detectionDatas = devkit.getBetweenTime(calcTimeQuery, dataGroupByBeaconID[beaconID]);
+        if (devkit.isEmpty(detectionDatas)) {
+          continue;
+        }
+        let aveRSSI = 0;
+        for (let detectionData of detectionDatas) {
+          aveRSSI += detectionData.RSSI;
+        }
+        aveRSSI /= detectionDatas.length;
+        const fixedDetectionData = {
+          "detectorNumber": detectorNum,
+          "RSSI": aveRSSI,
+          "TxPower": dataGroupByDetectorNum[detectorNum][0].TxPower,
+          "numOfDataForAve": sortedDetectorData.length,
+          "detectedTime": startTime
+        };
+        fixedDetectionDatas.push(fixedDetectionData);
       }
-      let aveRSSI = 0;
-      for (let detectionData of detectionDatas) {
-        aveRSSI += detectionData.RSSI;
-      }
-      aveRSSI /= detectionDatas.length;
-      const fixedDetectionData = {
-        "detectorNumber": detectorNum,
-        "RSSI": aveRSSI,
-        "TxPower": dataGroupByDetectorNum[detectorNum][0].TxPower,
-        "numOfDataForAve": sortedDetectorData.length,
-        "detectedTime": startTime
-      };
-      fixedDetectionDatas.push(fixedDetectionData);
     }
-    fs.writeFile(`./var/detector/No${detectorNumber}_${devkit.getDate2ymd(undefined, true, false)}.log`, fixedDetectionDatas);
+    fs.writeFileSync(`./var/detector/No${detectorNumber}_${devkit.getDate2ymd(undefined, true, false)}.log`, fixedDetectionDatas);
   }
   //受信機ログCSV読み込みの関数
   static readCsvFileData(detectorNumber) {
