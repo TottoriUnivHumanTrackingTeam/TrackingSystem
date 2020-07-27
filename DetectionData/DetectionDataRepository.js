@@ -10,7 +10,6 @@ const devkit = require('../devkit');
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
-const { result } = require('underscore');
 
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;

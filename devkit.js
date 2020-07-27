@@ -28,12 +28,12 @@ module.exports = class DevelopKitFunction {
   }
   //ファイルの有無確認
   static isExistFile(file) {
-    fs.stat(file, (err) => {
-      if(err) {
-        return false;
-      }
+    try {
+      fs.statSync(file);
       return true;
-    });
+    } catch(err) {
+      return false;
+    }
   }
   static isNotExistFile(file) {
     return !this.isExistFile(file);
