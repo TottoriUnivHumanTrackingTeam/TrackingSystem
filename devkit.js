@@ -28,14 +28,12 @@ module.exports = class DevelopKitFunction {
   }
   //ファイルの有無確認
   static isExistFile(file) {
-    try {
-      fs.statSync(file);
-      return true;
-    } catch(err) {
-      if(err.code === 'ENOENT') {
+    fs.stat(file, (err) => {
+      if(err) {
         return false;
       }
-    }
+      return true;
+    });
   }
   static isNotExistFile(file) {
     return !this.isExistFile(file);
@@ -73,16 +71,20 @@ module.exports = class DevelopKitFunction {
   }
   //dir内のファイルを一覧にして表示(extensionがfalseで拡張子を非表示)
   static async getDirectoryList(dir, extension=true) {
-    const fileList = fs.readdirSync(dir);
-    const regex = /\.[^/.]+$/;
-    if (extension) {
-      return files;
-    }
-    let dirList = [];
-    fileList.forEach(file => {
-      dirList.push(file.replace(regex, ""))
-    })
-    return dirList;
+    fs.readdir(dir, (err, files) => {
+      if (err) {
+        return false;
+      }
+      const regex = /\.[^/.]+$/;
+      if (extension) {
+        return files;
+      }
+      let dirList = [];
+      files.forEach(file => {
+        dirList.push(file.replace(regex, ""))
+      })
+      return dirList;
+    });
   }
   //時間内データのフィルタリング
   static getBetweenTime(searchTimesQuery, objects, searchBeaconID) {

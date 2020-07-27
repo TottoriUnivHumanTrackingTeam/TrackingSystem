@@ -10,6 +10,7 @@ const devkit = require('../devkit');
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
+const { result } = require('underscore');
 
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
@@ -119,13 +120,18 @@ module.exports = class DetectionDataRepository {
     console.log("deleteDetectionData: LogData")
     return res.result;
   }
-
+  //受信機ログ全データの読み込み関数
   static async detectorLog2Json() {
     return new Promise((resolve, reject) => {
       let log2json = [];
       let tasks = [];
       console.log("detectorLog2Json: Read");
       for (let detectorNumber = 1; detectorNumber <= 5; detectorNumber++) { //個数を指定する
+        tasks.push(this.intermediateFile(detectorNumber).catch(() => {
+          return reject(`detectorLog2Json: DetectorNo${detectorNumber} cant task push`);
+        }).then(() => {
+          console.log(`DetectorNo${detectorNumber} intermadiateFile task push ok`);
+        }));
         tasks.push(this.readCsvFileData(detectorNumber).catch(() => {
           return reject(`detectorLog2Json: DetectorNo${detectorNumber} cant task push`);
         }).then(result => {
@@ -140,7 +146,41 @@ module.exports = class DetectionDataRepository {
       })
     })
   }
-  //CSV読み込みの関数
+  //中間ファイル作成
+  static async intermediateFile(detectorNumber) {
+    console.log("intermediateFile: process");
+    const allDetectionDatas = await this.readCsvFileData(detectorNumber)
+    let startTime = Number(allDetectionDatas[0].detectedTime);
+    startTime = Math.floor(startTime/1000) * 1000;
+    const endTime = startTime + 86400000;
+    const fixedDetectionDatas = [];
+    while(endTime >= startTime) {
+      const calcTimeQuery = {
+        start: startTime,
+        end: startTime + 1000
+      };
+      startTime += 1000;
+      const detectionDatas = devkit.getBetweenTime(calcTimeQuery, allDetectionDatas);
+      if (devkit.isEmpty(detectionDatas)) {
+        continue;
+      }
+      let aveRSSI = 0;
+      for (let detectionData of detectionDatas) {
+        aveRSSI += detectionData.RSSI;
+      }
+      aveRSSI /= detectionDatas.length;
+      const fixedDetectionData = {
+        "detectorNumber": detectorNum,
+        "RSSI": aveRSSI,
+        "TxPower": dataGroupByDetectorNum[detectorNum][0].TxPower,
+        "numOfDataForAve": sortedDetectorData.length,
+        "detectedTime": startTime
+      };
+      fixedDetectionDatas.push(fixedDetectionData);
+    }
+    fs.writeFile(`./var/detector/No${detectorNumber}_${devkit.getDate2ymd(undefined, true, false)}.log`, fixedDetectionDatas);
+  }
+  //受信機ログCSV読み込みの関数
   static readCsvFileData(detectorNumber) {
     const date = devkit.getDate2ymd(null, true, false); //デバッグ時マジックナンバーが必要
     return new Promise((resolve, reject) => {
