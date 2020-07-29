@@ -59,40 +59,24 @@ module.exports = class PositionTracking {
     console.log("renewLocation: process")
     const allTrackers = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await DetectionDataRepository.detectorLog2Json();
-    let startTime = Number(allDetectionDatas[0].detectedTime);
-    startTime = Math.floor(startTime/1000) * 1000;
-    const endTime = startTime + 86400000;
+    const sortedDetectionDatas = _.sortBy(allDetectionDatas, 'detectedTime');
+    let startTime = sortedDetectionDatas[0].detectedTime;
+    const endTime = detectedTime + 86400000;
     console.log("renewLocation: doing")
     for (let tracker of allTrackers) {
       while (endTime >= startTime) {
-        const calcTimeQuery = {
-          start: startTime,
-          end: startTime + 1000
-        };
+        const detectionDatas = sortedDetectionDatas.filter((detectionData) => {
+          if (detectionData.detectedTime == startTime) {
+            if (detectionData.beaconID == tracker.beaconID) {
+              return true;
+            }
+          }
+        })
         startTime += 1000;
-        const detectionDatas = devkit.getBetweenTime(calcTimeQuery, allDetectionDatas);
         if (devkit.isEmpty(detectionDatas)) {
           continue;
         }
-        const dataGroupByDetectorNum = _.groupBy(detectionDatas, 'detectorNumber');
-        let fixedDetectionDatas = [];
-        for (let detectorNum in dataGroupByDetectorNum) {
-          const sortedDetectorData = _.sortBy(dataGroupByDetectorNum[detectorNum], 'RSSI');
-          let aveRSSI = 0;
-          for (let detectionData of sortedDetectorData) {
-            aveRSSI += detectionData.RSSI;
-          }
-          aveRSSI /= sortedDetectorData.length;
-          let fixedDetectionData = {
-            detectorNumber: detectorNum,
-            RSSI: aveRSSI,
-            TxPower: dataGroupByDetectorNum[detectorNum][0].TxPower,
-            numOfDataForAve: sortedDetectorData.length,
-            detectedTime: startTime
-          };
-          fixedDetectionDatas.push(fixedDetectionData);
-        }
-        const beaconAxis = await this.positionCalc(tracker.beaconID, fixedDetectionDatas);
+        const beaconAxis = await this.positionCalc(tracker.beaconID, detectionDatas);
         LocationRepository.addLocation(beaconAxis, "updateLocation");
       }
     }

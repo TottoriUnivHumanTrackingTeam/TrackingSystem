@@ -10,7 +10,6 @@ const devkit = require('../devkit');
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
-const TrackerRepository = require('../Tracker/TrackerRepository');
 
 const DBName = process.env.DB_NAME || "tracking";
 const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBName;
@@ -120,24 +119,19 @@ module.exports = class DetectionDataRepository {
     console.log("deleteDetectionData: LogData")
     return res.result;
   }
-  //受信機ログ全データの読み込み関数
+  //受信機ログ全データの中間ファイル読み込み関数
   static async detectorLog2Json() {
     return new Promise((resolve, reject) => {
       let log2json = [];
       let tasks = [];
       console.log("detectorLog2Json: Read");
       for (let detectorNumber = 1; detectorNumber <= 5; detectorNumber++) { //個数を指定する
-        tasks.push(this.intermediateFile(detectorNumber).catch(() => {
+        tasks.push(this.readCsvFileData(detectorNumber, true).catch(() => {
           return reject(`detectorLog2Json: DetectorNo${detectorNumber} cant task push`);
-        }).then(() => {
-          console.log(`DetectorNo${detectorNumber} intermadiateFile task push ok`);
-        }));
-        tasks.push(this.readCsvFileData(detectorNumber).catch(() => {
-          return reject(`detectorLog2Json: DetectorNo${detectorNumber} cant task push`);
-        }).then(result => {
+        })).then(result => {
           console.log(`DetectorNo${detectorNumber} read ok`);
           log2json = log2json.concat(result);
-        }))
+        })
       }
       Promise.all(tasks).catch(() => {
         return reject(`detectorLog2Json: DetectorNo${detectorNumber} reject`)
@@ -149,46 +143,42 @@ module.exports = class DetectionDataRepository {
   //中間ファイル作成
   static async intermediateFile(detectorNumber) {
     console.log("intermediateFile: process");
-    const allTracker = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await this.readCsvFileData(detectorNumber)
     let startTime = Number(allDetectionDatas[0].detectedTime);
     startTime = Math.floor(startTime/1000) * 1000;
     const endTime = startTime + 86400000;
-    const fixedDetectionDatas = [];
-    const dataGroupByBeaconID = _.groupBy(allDetectionDatas, "BeaconID");
-    for(let beaconID of dataGroupByBeaconID) {
+    const dataGroupByBeaconID = _.groupBy(allDetectionDatas, "beaconID");
+    for (let beaconID in dataGroupByBeaconID) {
+      console.log(beaconID)
       while(endTime >= startTime) {
         const calcTimeQuery = {
           start: startTime,
           end: startTime + 1000
         };
         startTime += 1000;
-        const detectionDatas = devkit.getBetweenTime(calcTimeQuery, dataGroupByBeaconID[beaconID]);
+        const searchData = dataGroupByBeaconID[beaconID].slice(0, 500); //500はマジックナンバー
+        const detectionDatas = devkit.getBetweenTime(calcTimeQuery, searchData);
         if (devkit.isEmpty(detectionDatas)) {
           continue;
         }
+        dataGroupByBeaconID[beaconID].splice(0, detectionDatas.length);
         let aveRSSI = 0;
         for (let detectionData of detectionDatas) {
           aveRSSI += detectionData.RSSI;
         }
         aveRSSI /= detectionDatas.length;
-        const fixedDetectionData = {
-          "detectorNumber": detectorNum,
-          "RSSI": aveRSSI,
-          "TxPower": dataGroupByDetectorNum[detectorNum][0].TxPower,
-          "numOfDataForAve": sortedDetectorData.length,
-          "detectedTime": startTime
-        };
-        fixedDetectionDatas.push(fixedDetectionData);
+        const fixedDetectionData = String.raw`${detectorNumber},${beaconID},${dataGroupByBeaconID[beaconID][0].TxPower},${Math.round(aveRSSI*100)/100},${startTime},${detectionDatas.length}`;
+        fs.appendFileSync(`./var/detector/FixedNo${detectorNumber}_${devkit.getDate2ymd(null, true, false)}.log`, fixedDetectionData + "\n");
       }
+      startTime = Number(allDetectionDatas[0].detectedTime);
+      startTime = Math.floor(startTime/1000) * 1000;
     }
-    fs.writeFileSync(`./var/detector/No${detectorNumber}_${devkit.getDate2ymd(undefined, true, false)}.log`, fixedDetectionDatas);
   }
   //受信機ログCSV読み込みの関数
-  static readCsvFileData(detectorNumber) {
+  static readCsvFileData(detectorNumber, fixed) {
     const date = devkit.getDate2ymd(null, true, false); //デバッグ時マジックナンバーが必要
     return new Promise((resolve, reject) => {
-      const logName = `No${detectorNumber}_${date}.log`;
+      const logName = fixed ? `FixedNo${detectorNumber}_${date}.log` : `No${detectorNumber}_${date}.log`;
       const logPath = path.join('./var/detector', logName);
       let tmp = [];
       if(devkit.isNotExistFile(logPath)) {
@@ -199,12 +189,24 @@ module.exports = class DetectionDataRepository {
       const rl = readline.createInterface(rs, {});
       rl.on('line', line => {
         const contents = line.split(",");
-        const jsonObj = {
-          "detectorNumber": Number(contents[0]),
-          "RSSI": Number(contents[3]),
-          "TxPower": Number(contents[2]),
-          "beaconID": contents[1],
-          "detectedTime": contents[4]
+        let jsonObj = {}
+        if (fixed) {
+          jsonObj = {
+            "detectorNumber": Number(contents[0]),
+            "RSSI": Number(contents[3]),
+            "TxPower": Number(contents[2]),
+            "beaconID": contents[1],
+            "detectedTime": contents[4],
+            "numOfDataForAve": contents[5]
+          }
+        } else {
+          jsonObj = {
+            "detectorNumber": Number(contents[0]),
+            "RSSI": Number(contents[3]),
+            "TxPower": Number(contents[2]),
+            "beaconID": contents[1],
+            "detectedTime": contents[4]
+          }
         }
         tmp.push(jsonObj);
       });
@@ -216,5 +218,8 @@ module.exports = class DetectionDataRepository {
 
   static async uploadData2Server(uploadData) {
     console.log(`uploadData2Server: ${uploadData.originalname}`);
+    const fileName = uploadData.originalname
+    const detectorNumber = fileName.match(/^No(?<detectorNumber>\d+)_/u);
+    this.intermediateFile(detectorNumber.groups.detectorNumber);
   }
 };
