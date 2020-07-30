@@ -60,8 +60,8 @@ module.exports = class PositionTracking {
     const allTrackers = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await DetectionDataRepository.detectorLog2Json();
     const sortedDetectionDatas = _.sortBy(allDetectionDatas, 'detectedTime');
-    let startTime = sortedDetectionDatas[0].detectedTime;
-    const endTime = detectedTime + 86400000;
+    let startTime = Number(sortedDetectionDatas[0].detectedTime);
+    const endTime = startTime + 86400000;
     console.log("renewLocation: doing")
     for (let tracker of allTrackers) {
       while (endTime >= startTime) {

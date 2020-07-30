@@ -126,12 +126,12 @@ module.exports = class DetectionDataRepository {
       let tasks = [];
       console.log("detectorLog2Json: Read");
       for (let detectorNumber = 1; detectorNumber <= 5; detectorNumber++) { //個数を指定する
-        tasks.push(this.readCsvFileData(detectorNumber, true).catch(() => {
-          return reject(`detectorLog2Json: DetectorNo${detectorNumber} cant task push`);
-        })).then(result => {
+        tasks.push(this.readCsvFileData(detectorNumber, true).then(result => {
           console.log(`DetectorNo${detectorNumber} read ok`);
           log2json = log2json.concat(result);
-        })
+        }).catch(() => {
+          return reject(`detectorLog2Json: DetectorNo${detectorNumber} cant task push`);
+        }))
       }
       Promise.all(tasks).catch(() => {
         return reject(`detectorLog2Json: DetectorNo${detectorNumber} reject`)
@@ -196,8 +196,8 @@ module.exports = class DetectionDataRepository {
             "RSSI": Number(contents[3]),
             "TxPower": Number(contents[2]),
             "beaconID": contents[1],
-            "detectedTime": contents[4],
-            "numOfDataForAve": contents[5]
+            "detectedTime": Number(contents[4]),
+            "numOfDataForAve": Number(contents[5])
           }
         } else {
           jsonObj = {
@@ -205,7 +205,7 @@ module.exports = class DetectionDataRepository {
             "RSSI": Number(contents[3]),
             "TxPower": Number(contents[2]),
             "beaconID": contents[1],
-            "detectedTime": contents[4]
+            "detectedTime": Number(contents[4])
           }
         }
         tmp.push(jsonObj);
@@ -220,6 +220,6 @@ module.exports = class DetectionDataRepository {
     console.log(`uploadData2Server: ${uploadData.originalname}`);
     const fileName = uploadData.originalname
     const detectorNumber = fileName.match(/^No(?<detectorNumber>\d+)_/u);
-    this.intermediateFile(detectorNumber.groups.detectorNumber);
+    await this.intermediateFile(detectorNumber.groups.detectorNumber);
   }
 };
