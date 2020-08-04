@@ -84,7 +84,6 @@ module.exports = class PositionTracking {
         LocationRepository.addLocation(beaconAxis, "updateLocation");
       }
       stepIndex = 0;
-      startTime = Number(sortedDetectionDatas[0].detectedTime);
     }
   }
 

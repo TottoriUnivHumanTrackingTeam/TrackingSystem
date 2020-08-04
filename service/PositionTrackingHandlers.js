@@ -43,7 +43,6 @@ module.exports = class PositionTrackingHandlers {
       console.log("renewLocation: done")
       DetectionDataRepository.deleteDetectionData().then(() => {
         console.log("deleteDetectionData: done")
-        res.send("RenewLocationData Success!");
       })
     })
   }
