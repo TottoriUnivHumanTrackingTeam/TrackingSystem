@@ -60,25 +60,32 @@ module.exports = class PositionTracking {
     const allTrackers = await TrackerRepository.getAllTracker();
     const allDetectionDatas = await DetectionDataRepository.detectorLog2Json();
     const sortedDetectionDatas = _.sortBy(allDetectionDatas, 'detectedTime');
+    let stepIndex = 0
+    const step = allTrackers.length*11;
     let startTime = Number(sortedDetectionDatas[0].detectedTime);
     const endTime = startTime + 86400000;
     console.log("renewLocation: doing")
     for (let tracker of allTrackers) {
       while (endTime >= startTime) {
-        const detectionDatas = sortedDetectionDatas.filter((detectionData) => {
+        const searchDatas = sortedDetectionDatas.slice(stepIndex, stepIndex + step);
+        const detectionDatas = searchDatas.filter((detectionData) => {
           if (detectionData.detectedTime == startTime) {
             if (detectionData.beaconID == tracker.beaconID) {
               return true;
             }
           }
         })
+        stepIndex += detectionDatas.length;
         startTime += 1000;
         if (devkit.isEmpty(detectionDatas)) {
           continue;
         }
         const beaconAxis = await this.positionCalc(tracker.beaconID, detectionDatas);
+        console.log(beaconAxis)
         LocationRepository.addLocation(beaconAxis, "updateLocation");
       }
+      stepIndex = 0;
+      startTime = Number(sortedDetectionDatas[0].detectedTime);
     }
   }
 

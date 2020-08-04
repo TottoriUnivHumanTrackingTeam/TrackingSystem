@@ -45,7 +45,9 @@ module.exports = class DetectionDataRepository {
     const loggerPath = path.join('./var/log/', logName);
     if (devkit.isNotExistFile(loggerPath)) {
       fs.writeFile(loggerPath, "", (err) => {
-        console.log(err);
+        if (err) {
+          console.log(err);
+        }
       })
     }
     if (devkit.isNotEmpty(detectionData)) {
@@ -140,39 +142,46 @@ module.exports = class DetectionDataRepository {
       })
     })
   }
-  //中間ファイル作成
+  //中間ファイル作成(beaconIDごとにファイル生成したほうがいいかも)場所ごとに時間記録するべき
   static async intermediateFile(detectorNumber) {
     console.log("intermediateFile: process");
     const allDetectionDatas = await this.readCsvFileData(detectorNumber)
     let startTime = Number(allDetectionDatas[0].detectedTime);
     startTime = Math.floor(startTime/1000) * 1000;
     const endTime = startTime + 86400000;
+    let stepIndex = 0;
+    const step = 11; //ビーコン送信数+1
     const dataGroupByBeaconID = _.groupBy(allDetectionDatas, "beaconID");
+    let writeData = [];
     for (let beaconID in dataGroupByBeaconID) {
-      console.log(beaconID)
+      console.log(dataGroupByBeaconID[beaconID])
       while(endTime >= startTime) {
         const calcTimeQuery = {
           start: startTime,
           end: startTime + 1000
         };
         startTime += 1000;
-        const searchData = dataGroupByBeaconID[beaconID].slice(0, 500); //500はマジックナンバー
+        const searchData = dataGroupByBeaconID[beaconID].slice(stepIndex, stepIndex + step);
         const detectionDatas = devkit.getBetweenTime(calcTimeQuery, searchData);
         if (devkit.isEmpty(detectionDatas)) {
           continue;
         }
-        dataGroupByBeaconID[beaconID].splice(0, detectionDatas.length);
+        stepIndex += detectionDatas.length;
         let aveRSSI = 0;
         for (let detectionData of detectionDatas) {
           aveRSSI += detectionData.RSSI;
         }
         aveRSSI /= detectionDatas.length;
-        const fixedDetectionData = String.raw`${detectorNumber},${beaconID},${dataGroupByBeaconID[beaconID][0].TxPower},${Math.round(aveRSSI*100)/100},${startTime},${detectionDatas.length}`;
-        fs.appendFileSync(`./var/detector/FixedNo${detectorNumber}_${devkit.getDate2ymd(null, true, false)}.log`, fixedDetectionData + "\n");
+        const fixedDetectionData = String.raw`${detectorNumber},${beaconID},${detectionDatas[0].TxPower},${Math.round(aveRSSI*100)/100},${startTime},${detectionDatas.length}` + "\n";
+        writeData.push(fixedDetectionData);
       }
+      fs.appendFileSync(`./var/detector/FixedNo${detectorNumber}_${devkit.getDate2ymd(null, true, false)}.log`, writeData.join(""));
+      writeData = [];
+      stepIndex = 0;
       startTime = Number(allDetectionDatas[0].detectedTime);
       startTime = Math.floor(startTime/1000) * 1000;
     }
+    console.log("intermediateFile: done")
   }
   //受信機ログCSV読み込みの関数
   static readCsvFileData(detectorNumber, fixed) {
