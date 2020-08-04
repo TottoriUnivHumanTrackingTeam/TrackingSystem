@@ -37,7 +37,7 @@ module.exports = class PositionTrackingHandlers {
     res.send("Tracking Stop!");
   }
 
-  static updateYesterdayPositionTracking() {
+  static updateYesterdayPositionTracking(req, res) {
     console.log("updateYesterdayPositionTracking: start")
     PositionTracking.renewLocation().then(() => {
       console.log("renewLocation: done")

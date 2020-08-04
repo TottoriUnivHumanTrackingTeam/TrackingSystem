@@ -57,30 +57,29 @@ module.exports = class PositionTracking {
 
   static async renewLocation() {
     console.log("renewLocation: process")
-    const allTrackers = await TrackerRepository.getAllTracker();
+    const allDetector = await DetectorRepository.getDetector();
     const allDetectionDatas = await DetectionDataRepository.detectorLog2Json();
-    const sortedDetectionDatas = _.sortBy(allDetectionDatas, 'detectedTime');
+    const dataGroupByBeaconID = _.groupBy(allDetectionDatas, 'beaconID');
     let stepIndex = 0
-    const step = allTrackers.length*11;
-    let startTime = Number(sortedDetectionDatas[0].detectedTime);
-    const endTime = startTime + 86400000;
+    const step = allDetector.length + 1;
     console.log("renewLocation: doing")
-    for (let tracker of allTrackers) {
+    for (let beaconID in dataGroupByBeaconID) {
+      const sortedByDetectedTime = _.sortBy(dataGroupByBeaconID[beaconID], "detectedTime");
+      let startTime = Number(sortedByDetectedTime[0].detectedTime);
+      const endTime = startTime + 86400000;
       while (endTime >= startTime) {
-        const searchDatas = sortedDetectionDatas.slice(stepIndex, stepIndex + step);
+        const searchDatas = sortedByDetectedTime.slice(stepIndex, stepIndex + step);
         const detectionDatas = searchDatas.filter((detectionData) => {
           if (detectionData.detectedTime == startTime) {
-            if (detectionData.beaconID == tracker.beaconID) {
-              return true;
-            }
+            return true;
           }
         })
-        stepIndex += detectionDatas.length;
         startTime += 1000;
         if (devkit.isEmpty(detectionDatas)) {
           continue;
         }
-        const beaconAxis = await this.positionCalc(tracker.beaconID, detectionDatas);
+        stepIndex += detectionDatas.length;
+        const beaconAxis = await this.positionCalc(beaconID, detectionDatas);
         console.log(beaconAxis)
         LocationRepository.addLocation(beaconAxis, "updateLocation");
       }
