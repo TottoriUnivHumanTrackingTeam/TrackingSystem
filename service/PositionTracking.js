@@ -7,7 +7,6 @@ const DetectionDataRepository = require('../DetectionData/DetectionDataRepositor
 const LocationRepository = require('../Location/LocationRepository');
 const MapRepository = require('../Map/MapRepository');
 const devkit = require('../devkit');
-const path = require('path');
 
 const weightOfMedian = 2;
 const weightOfDistance = 1.8;
@@ -62,6 +61,7 @@ module.exports = class PositionTracking {
     const dataGroupByBeaconID = _.groupBy(allDetectionDatas, 'beaconID');
     let stepIndex = 0
     const step = allDetector.length + 1;
+    const beaconAxises = []
     console.log("renewLocation: doing")
     for (let beaconID in dataGroupByBeaconID) {
       const sortedByDetectedTime = _.sortBy(dataGroupByBeaconID[beaconID], "detectedTime");
@@ -80,11 +80,11 @@ module.exports = class PositionTracking {
         }
         stepIndex += detectionDatas.length;
         const beaconAxis = await this.positionCalc(beaconID, detectionDatas);
-        console.log(beaconAxis)
-        LocationRepository.addLocation(beaconAxis, "updateLocation");
+        beaconAxises.push(beaconAxis);
       }
       stepIndex = 0;
     }
+    LocationRepository.addManyLocation("updateLocation", beaconAxises)
   }
 
   static async positionCalc(beaconID, detectionDatas) {

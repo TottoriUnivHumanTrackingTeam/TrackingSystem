@@ -29,6 +29,16 @@ module.exports = class LocationRepository {
     client.close();
     return res.result;
   }
+
+  static async addManyLocation(insertLocation, location) {
+    const client = await MongoClient.connect(DBURL).catch(err => {
+      console.log(err);
+    })
+    const db = client.db(DBName);
+    const res = await db.collection(insertLocation).insertMany(location);
+    client.close();
+    return res.result;
+  }
   // FIX ME: Locationの取得条件を複合的に指定できるように関数を作り変える
   static async getLocationByTime(searchBeaconID, searchTimes, searchLocation) {
     const client = await MongoClient.connect(DBURL).catch(err => {
