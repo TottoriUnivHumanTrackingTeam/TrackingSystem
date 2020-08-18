@@ -50,7 +50,8 @@ module.exports = class LocationRepository {
       locations.push(location);
     }
     locations.forEach((location, idx) => {
-      if(locations[idx+1] && locations[idx].locatedTime - 15000 > locations[idx+1].locatedTime){
+      //閾値：19秒以下に変更
+      if(locations[idx+1] && locations[idx].locatedTime - 19000 > locations[idx+1].locatedTime){
         locations[idx+1].alert = true;
       }
     });
