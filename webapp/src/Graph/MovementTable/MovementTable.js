@@ -42,17 +42,37 @@ export default function MovementTable(props) {
   const makeList = useCallback(() => {
     console.log(locations);
     const list = [];
-    for (let time = term.start; time < term.end; time += 10000) {
+    let name = "";
+    let count = 0;
+    let lastTime;
+    for (let time = term.start; time <= term.end; time += 30000) {
+      console.log(time + 30000);
       const location = locations.find(
-        location => location.locatedTime >= time && location.locatedTime < time + 10000
+        location => location.locatedTime >= time && location.locatedTime < time + 30000
       );
-      const name = location.map;
-      list.push({
-        time: `${unixTime2ymd(time)} ~ ${unixTime2ymd(time + 10000)}`,
-        mapName: name
-      });
+      if(location){
+        const nowMap = location.map;
+          if(name != nowMap){
+            if(time != term.start){
+            list.push({
+              time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
+              mapName: name
+          });}
+          count = 30000;
+          name = nowMap;
+        }else{
+          count += 30000;
+        }
+      }else{
+        count += 30000;
+      }
       setLocationList(list);
+      lastTime = time;
     }
+    list.push({
+      time: `${unixTime2ymd(lastTime - count)} ~ ${unixTime2ymd(lastTime)}`,
+      mapName: name
+    });
   }, [locations]);
 
   const makeMapList = (map) => {
