@@ -71,20 +71,16 @@ module.exports = class DevelopKitFunction {
   }
   //dir内のファイルを一覧にして表示(extensionがfalseで拡張子を非表示)
   static async getDirectoryList(dir, extension=true) {
-    fs.readdir(dir, (err, files) => {
-      if (err) {
-        return false;
-      }
-      const regex = /\.[^/.]+$/;
-      if (extension) {
-        return files;
-      }
-      let dirList = [];
-      files.forEach(file => {
-        dirList.push(file.replace(regex, ""))
-      })
-      return dirList;
-    });
+    const files = fs.readdirSync(dir);
+    const regex = /\.[^/.]+$/;
+    if (extension) {
+      return files;
+    }
+    let dirList = [];
+    files.forEach(file => {
+      dirList.push(file.replace(regex, ""))
+    })
+    return dirList;
   }
   //時間内データのフィルタリング
   static getBetweenTime(searchTimesQuery, objects, searchBeaconID) {

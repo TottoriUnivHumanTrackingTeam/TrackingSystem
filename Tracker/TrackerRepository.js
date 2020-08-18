@@ -52,21 +52,24 @@ module.exports = class TrackerRepository {
     let trackers = [];
     for (let tracker of trackerQuery) {
       if (Object.keys(searchTimes).length) {
-        const searchDay = devkit.getDate2ymd(searchTimes["start"]);
-        const dateNow = devkit.getDate2ymd();
+        const startDay = devkit.getDate2ymd(searchTimes["start"]);
+        const endDay = devkit.getDate2ymd(searchTimes["end"]);
         let dateList = [];
-        if (searchDay <= dateNow - 7) {
+        if (startDay <= endDay - 7) {
           dateList = await devkit.getDirectoryList('./var/updatelocation', false);
         }
-        const searchDateList = dateList.filter(date => {
-          return searchDay >= date;
-        });
+        let searchDateList = [];
+        if (devkit.isNotEmpty(dateList)) {
+          searchDateList = dateList.filter(date => {
+            return startDay >= date;
+          });
+        }
         const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
         let locationType = "";
         if (devkit.isNotEmpty(searchDateList)) {
           LocationRepository.loadAndDeployLocation(searchDateList[searchDateList.length - 1]);
           locationType = locationTypeArray[0];
-        } else if (searchDay == dateNow) {
+        } else if (startDay == endDay) {
           locationType = locationTypeArray[1];
         } else {
           locationType = locationTypeArray[2];

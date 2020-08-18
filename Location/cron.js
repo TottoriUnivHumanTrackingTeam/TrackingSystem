@@ -13,5 +13,5 @@ module.exports.day = cron.schedule(daySchedule, () => {
 
 module.exports.week = cron.schedule(weekSchedule, () => {
   console.log("cron schedule: week location")
-  Handler.logMakeAndDelete("updatelocation");
+  Handler.logMakeAndDelete("updateLocation");
 });
