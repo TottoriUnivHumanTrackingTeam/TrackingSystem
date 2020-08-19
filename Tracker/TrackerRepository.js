@@ -53,21 +53,21 @@ module.exports = class TrackerRepository {
     for (let tracker of trackerQuery) {
       //Review
       if (Object.keys(searchTimes).length) {
-        const startDay = devkit.getDate2ymd(searchTimes["start"]);
-        const endDay = devkit.getDate2ymd(searchTimes["end"]);
+        const searchDay = devkit.getDate2ymd(searchTimes["start"]);
+        const dayNow = devkit.getDate2ymd();
         let dateList = [];
-        if (endDay - startDay >= 7) {
+        if (dayNow - searchDay >= 7) {
           dateList = await devkit.getDirectoryList('./var/updatelocation', false);
         }
         let searchDate = [];
         if (devkit.isNotEmpty(dateList)) {
           searchDate = dateList.find(date => {
-            return endDay <= date;
+            return searchDay <= date;
           });
         }
         const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
         let locationType = "";
-        if (startDay == endDay) {
+        if (searchDay == dayNow) {
           locationType = locationTypeArray[1];
         } else if (devkit.isNotEmpty(searchDate)) {
           LocationRepository.loadAndDeployLocation(searchDate);
@@ -97,21 +97,21 @@ module.exports = class TrackerRepository {
     const tracker = await db.collection('tracker').findOne(searchQuery);
     //Review
     if (Object.keys(times).length) {
-      const startDay = devkit.getDate2ymd(times["start"])
-      const endDay = devkit.getDate2ymd(times["end"])
+      const searchDay = devkit.getDate2ymd(searchTimes["start"]);
+      const dayNow = devkit.getDate2ymd();
       let dateList = [];
-      if (endDay - startDay >= 7) {
+      if (dayNow - searchDay >= 7) {
         dateList = await devkit.getDirectoryList('./var/updatelocation', false);
       }
       let searchDate = [];
       if (devkit.isNotEmpty(dateList)) {
         searchDate = dateList.find(date => {
-          return endDay <= date;
+          return searchDay <= date;
         });
       }
       const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
       let locationType = "";
-      if (startDay == endDay) {
+      if (searchDay == dayNow) {
         locationType = locationTypeArray[1];
       } else if (devkit.isNotEmpty(searchDate)) {
         LocationRepository.loadAndDeployLocation(searchDate);
@@ -139,21 +139,21 @@ module.exports = class TrackerRepository {
     client.close();
     //Review
     if (Object.keys(times).length) {
-      const startDay = devkit.getDate2ymd(times["start"])
-      const endDay = devkit.getDate2ymd(times["end"])
+      const searchDay = devkit.getDate2ymd(searchTimes["start"]);
+      const dayNow = devkit.getDate2ymd();
       let dateList = [];
-      if (endDay - startDay >= 7) {
+      if (dayNow - searchDay >= 7) {
         dateList = await devkit.getDirectoryList('./var/updatelocation', false);
       }
       let searchDate = [];
       if (devkit.isNotEmpty(dateList)) {
         searchDate = dateList.find(date => {
-          return endDay <= date;
+          return searchDay <= date;
         });
       }
       const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
       let locationType = "";
-      if (startDay == endDay) {
+      if (searchDay == dayNow) {
         locationType = locationTypeArray[1];
       } else if (devkit.isNotEmpty(searchDate)) {
         LocationRepository.loadAndDeployLocation(searchDate);
