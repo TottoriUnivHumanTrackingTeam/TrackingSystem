@@ -51,26 +51,27 @@ module.exports = class TrackerRepository {
     client.close();
     let trackers = [];
     for (let tracker of trackerQuery) {
+      //Review
       if (Object.keys(searchTimes).length) {
         const startDay = devkit.getDate2ymd(searchTimes["start"]);
         const endDay = devkit.getDate2ymd(searchTimes["end"]);
         let dateList = [];
-        if (startDay <= endDay - 7) {
+        if (endDay - startDay >= 7) {
           dateList = await devkit.getDirectoryList('./var/updatelocation', false);
         }
-        let searchDateList = [];
+        let searchDate = [];
         if (devkit.isNotEmpty(dateList)) {
-          searchDateList = dateList.filter(date => {
-            return startDay >= date;
+          searchDate = dateList.find(date => {
+            return endDay <= date;
           });
         }
         const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
         let locationType = "";
-        if (devkit.isNotEmpty(searchDateList)) {
-          LocationRepository.loadAndDeployLocation(searchDateList[searchDateList.length - 1]);
-          locationType = locationTypeArray[0];
-        } else if (startDay == endDay) {
+        if (startDay == endDay) {
           locationType = locationTypeArray[1];
+        } else if (devkit.isNotEmpty(searchDate)) {
+          LocationRepository.loadAndDeployLocation(searchDate);
+          locationType = locationTypeArray[0];
         } else {
           locationType = locationTypeArray[2];
         }
@@ -94,8 +95,31 @@ module.exports = class TrackerRepository {
     const db = client.db(DBName);
     const searchQuery = { beaconID: searchedBeaconID };
     const tracker = await db.collection('tracker').findOne(searchQuery);
+    //Review
     if (Object.keys(times).length) {
-      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times, "location");
+      const startDay = devkit.getDate2ymd(times["start"])
+      const endDay = devkit.getDate2ymd(times["end"])
+      let dateList = [];
+      if (endDay - startDay >= 7) {
+        dateList = await devkit.getDirectoryList('./var/updatelocation', false);
+      }
+      let searchDate = [];
+      if (devkit.isNotEmpty(dateList)) {
+        searchDate = dateList.find(date => {
+          return endDay <= date;
+        });
+      }
+      const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
+      let locationType = "";
+      if (startDay == endDay) {
+        locationType = locationTypeArray[1];
+      } else if (devkit.isNotEmpty(searchDate)) {
+        LocationRepository.loadAndDeployLocation(searchDate);
+        locationType = locationTypeArray[0];
+      } else {
+        locationType = locationTypeArray[2];
+      }
+      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times, locationType);
       tracker.Location = locations;
     } else {
       const locations = await LocationRepository.getLocationRecently(tracker.beaconID);
@@ -113,8 +137,31 @@ module.exports = class TrackerRepository {
     const searchQuery = { trackerID: searchedTrackerID };
     const tracker = await db.collection('tracker').findOne(searchQuery);
     client.close();
+    //Review
     if (Object.keys(times).length) {
-      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times, "location");
+      const startDay = devkit.getDate2ymd(times["start"])
+      const endDay = devkit.getDate2ymd(times["end"])
+      let dateList = [];
+      if (endDay - startDay >= 7) {
+        dateList = await devkit.getDirectoryList('./var/updatelocation', false);
+      }
+      let searchDate = [];
+      if (devkit.isNotEmpty(dateList)) {
+        searchDate = dateList.find(date => {
+          return endDay <= date;
+        });
+      }
+      const locationTypeArray = ["temporaryLocation", "location", "updateLocation"];
+      let locationType = "";
+      if (startDay == endDay) {
+        locationType = locationTypeArray[1];
+      } else if (devkit.isNotEmpty(searchDate)) {
+        LocationRepository.loadAndDeployLocation(searchDate);
+        locationType = locationTypeArray[0];
+      } else {
+        locationType = locationTypeArray[2];
+      }
+      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times, locationType);
       tracker.Location = locations;
     } else {
       const locations = await LocationRepository.getLocationRecently(tracker.beaconID);
