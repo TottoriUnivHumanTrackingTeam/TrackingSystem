@@ -12,7 +12,6 @@ import TermSelector from '../TermSelector';
 import OnlyTrackerSelector from './OnlyTrackerSelector';
 
 export default function MovementTable(props) {
-  //const [map,setMap] = useState();
   const [term, setTerm] = useState({});
   const [locations, setLocations] = useState([]);
   const [chosenTracker, setChosenTracker] = useState([]);
@@ -40,39 +39,41 @@ export default function MovementTable(props) {
   };
 
   const makeList = useCallback(() => {
-    console.log(locations);
     const list = [];
-    let name = "";
+    let name = "none";
     let count = 0;
-    let lastTime;
     for (let time = term.start; time <= term.end; time += 30000) {
-      console.log(time + 30000);
       const location = locations.find(
         location => location.locatedTime >= time && location.locatedTime < time + 30000
       );
       if(location){
         const nowMap = location.map;
-          if(name != nowMap){
-            if(time != term.start){
+        if(name != nowMap){
+          if(time != term.start){
             list.push({
               time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
               mapName: name
-          });}
+            });
+          }
           count = 30000;
           name = nowMap;
         }else{
           count += 30000;
         }
       }else{
-        count += 30000;
+        if(name != "none"){
+          list.push({
+            time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
+            mapName: name
+          });
+          name = "none"
+          count = 30000;
+        }else{
+          count += 30000;
+        }
       }
       setLocationList(list);
-      lastTime = time;
     }
-    list.push({
-      time: `${unixTime2ymd(lastTime - count)} ~ ${unixTime2ymd(lastTime)}`,
-      mapName: name
-    });
   }, [locations]);
 
   const makeMapList = (map) => {
