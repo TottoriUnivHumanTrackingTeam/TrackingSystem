@@ -1,46 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import jaLocale from 'date-fns/locale/ja';
 import 'date-fns';
-import { DateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 export default function MaterialUIPickers(props) {
+  const [selectDate, setSelectDate] = useState(new Date());
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
   const send = () => {
     const term = {
       start: startDate.getTime(),
-      end: endDate.getTime()
+      end: endDate
     };
     props.onSend(term);
   };
+
+  useEffect(() => {
+    startDate.setFullYear(selectDate.getFullYear());
+    startDate.setMonth(selectDate.getMonth());
+    startDate.setDate(selectDate.getDate());
+    startDate.setHours(0, 0, 0, 0);
+    setStartDate(startDate);
+    const endDate = startDate.getTime() + 86399999;
+    setEndDate(endDate);
+  }, [selectDate]);
 
   useEffect(send, [endDate]);
 
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={jaLocale}>
       <Grid container justify="space-around">
-        <DateTimePicker
+        <DatePicker
           variant="inline"
-          label="開始時間"
-          format="yyyy/MM/dd h:mm"
-          value={startDate}
+          label="日付"
+          format="yyyy/MM/dd"
+          value={selectDate}
           onChange={date => {
-            setStartDate(date);
-            setEndDate(date);
+            setSelectDate(date);
           }}
-        />
-      </Grid>
-      <br />
-      <Grid container justify="space-around">
-        <DateTimePicker
-          variant="inline"
-          label="終了時間"
-          format="yyyy/MM/dd h:mm"
-          value={endDate}
-          onChange={date => setEndDate(date)}
         />
       </Grid>
     </MuiPickersUtilsProvider>

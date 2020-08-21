@@ -42,6 +42,7 @@ export default function MovementTable(props) {
     const list = [];
     let name = "none";
     let count = 0;
+    let recentlyTime;
     for (let time = term.start; time <= term.end; time += 30000) {
       const location = locations.find(
         location => location.locatedTime >= time && location.locatedTime < time + 30000
@@ -73,7 +74,13 @@ export default function MovementTable(props) {
         }
       }
       setLocationList(list);
+      recentlyTime = time;
     }
+    list.push({
+      time: `${unixTime2ymd(recentlyTime - count)} ~ ${unixTime2ymd(recentlyTime)}`,
+      mapName: name
+    });
+    setLocationList(list);
   }, [locations]);
 
   const makeMapList = (map) => {

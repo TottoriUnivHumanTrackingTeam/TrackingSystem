@@ -103,7 +103,26 @@ module.exports = class TrackerRepository {
         const map = allMap.find(map => {
           return map.mapID === location.map;
         });
-        location.map = map.name;
+        let mapName = map.name;
+        if(mapName == "つぐみ部屋６"){
+          mapName = "つぐみ廊下";
+        }else if(mapName == "つぐみ部屋７"){
+          mapName = "つぐみ廊下";
+        }else if(mapName == "つぐみ部屋１０"){
+          mapName = "つぐみ廊下";
+        }
+        if(mapName == "つぐみ中央"){
+          if(location.grid.x <170){
+            if(location.grid.y > 500){
+              mapName = "自室";
+            }
+          }
+        }else if(mapName == "つぐみ廊下"){
+          if(location.grid.y > 430){
+            mapName = "自室";
+          }
+        }
+        location.map = mapName;
       }
     }
     return tracker;
