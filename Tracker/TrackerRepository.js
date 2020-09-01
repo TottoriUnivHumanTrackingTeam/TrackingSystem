@@ -112,14 +112,20 @@ module.exports = class TrackerRepository {
           mapName = "つぐみ廊下";
         }
         if(mapName == "つぐみ中央"){
-          if(location.grid.x <170){
-            if(location.grid.y > 500){
-              mapName = "自室";
-            }
+          if(location.grid.x <160 && location.grid.y > 500){
+            mapName = "つぐみ部屋４";
+          }else if(location.grid.x > 275){
+            mapName = "つぐみトイレ";
+          }else if(location.grid.x > 240 && location.grid.y > 530){
+            mapName = "つぐみトイレ";
           }
         }else if(mapName == "つぐみ廊下"){
           if(location.grid.y > 430){
-            mapName = "自室";
+            mapName = "つぐみ部屋４";
+          }
+        }else if(mapName == "つぐみ前廊下"){
+          if(location.grid.y > 500 && location.grid.y < 620){
+            mapName = "つぐみトイレ";
           }
         }
         location.map = mapName;

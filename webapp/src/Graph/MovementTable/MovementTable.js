@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import _, { max } from 'underscore';
+import _, { max, result, map } from 'underscore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -43,12 +43,16 @@ export default function MovementTable(props) {
     let name = "none";
     let count = 0;
     let recentlyTime;
-    for (let time = term.start; time <= term.end; time += 30000) {
-      const location = locations.find(
-        location => location.locatedTime >= time && location.locatedTime < time + 30000
-      );
-      if(location){
-        const nowMap = location.map;
+    for (let time = term.start; time <= term.end; time += 60000) {
+      const selectLocation = _.filter(locations, location => {
+        return location.locatedTime >= time && location.locatedTime < time + 60000;
+      });
+      const locationMaps = _.map(selectLocation, location => {
+        return location.map;
+      });
+      //const nowMap = toCountDict(locationMaps);
+      const nowMap = mode(locationMaps);
+      if(locationMaps){
         if(name != nowMap){
           if(time != term.start){
             list.push({
@@ -56,10 +60,10 @@ export default function MovementTable(props) {
               mapName: name
             });
           }
-          count = 30000;
+          count = 60000;
           name = nowMap;
         }else{
-          count += 30000;
+          count += 60000;
         }
       }else{
         if(name != "none"){
@@ -68,23 +72,55 @@ export default function MovementTable(props) {
             mapName: name
           });
           name = "none"
-          count = 30000;
+          count = 60000;
         }else{
-          count += 30000;
+          count += 60000;
         }
       }
       setLocationList(list);
       recentlyTime = time;
     }
-    list.push({
-      time: `${unixTime2ymd(recentlyTime - count)} ~ ${unixTime2ymd(recentlyTime)}`,
-      mapName: name
-    });
-    setLocationList(list);
+    if(recentlyTime != term.start){
+      list.push({
+        time: `${unixTime2ymd(recentlyTime - count)} ~ ${unixTime2ymd(recentlyTime)}`,
+        mapName: name
+      });
+      setLocationList(list);
+    }
   }, [locations]);
 
   const makeMapList = (map) => {
     return map;
+  };
+
+  const mode = (locationMaps) => {
+    let maps = [];
+    let fly = false;
+    if(locationMaps.length < 15){
+      return "none";
+    }
+    locationMaps.forEach((mapName) => {
+      for(let i=0; i<maps.length; i++){
+        if(maps[i][0] == mapName){
+          maps[i][1] += 1;
+          fly = true;
+        }
+      }
+      if(!fly){
+        maps.push([mapName, 1]);
+      }else{
+        fly = false;
+      }
+    });
+    let modeMap = 0;
+    let modeNum = 0;
+    for(let i=0; i<maps.length; i++){
+      if(maps[i][1] > modeMap){
+        modeMap = maps[i][1];
+        modeNum = i;
+      }
+    }
+    return maps[modeNum][0];
   };
 
   useEffect(() => {
