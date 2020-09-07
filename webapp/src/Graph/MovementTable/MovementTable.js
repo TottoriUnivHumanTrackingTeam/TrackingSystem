@@ -78,7 +78,7 @@ export default function MovementTable(props) {
         }
       }
       setLocationList(list);
-      recentlyTime = time;
+      recentlyTime = time + 60000;
     }
     if(recentlyTime != term.start){
       list.push({
@@ -96,7 +96,7 @@ export default function MovementTable(props) {
   const mode = (locationMaps) => {
     let maps = [];
     let fly = false;
-    if(locationMaps.length < 15){
+    if(locationMaps.length < 5){
       return "none";
     }
     locationMaps.forEach((mapName) => {

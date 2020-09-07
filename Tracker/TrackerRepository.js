@@ -104,26 +104,26 @@ module.exports = class TrackerRepository {
           return map.mapID === location.map;
         });
         let mapName = map.name;
-        if(mapName == "つぐみ部屋６"){
+        if(mapName == "つぐみ部屋６"){//17番の受信機による誤判定回避
           mapName = "つぐみ廊下";
         }else if(mapName == "つぐみ部屋７"){
           mapName = "つぐみ廊下";
         }else if(mapName == "つぐみ部屋１０"){
           mapName = "つぐみ廊下";
         }
-        if(mapName == "つぐみ中央"){
-          if(location.grid.x <160 && location.grid.y > 500){
+        if(mapName == "つぐみ中央"){//つぐみ中央補正
+          if(location.grid.x <155 && location.grid.y > 500){
             mapName = "つぐみ部屋４";
           }else if(location.grid.x > 275){
             mapName = "つぐみトイレ";
           }else if(location.grid.x > 240 && location.grid.y > 530){
             mapName = "つぐみトイレ";
           }
-        }else if(mapName == "つぐみ廊下"){
+        }else if(mapName == "つぐみ廊下"){//つぐみ廊下補正
           if(location.grid.y > 430){
             mapName = "つぐみ部屋４";
           }
-        }else if(mapName == "つぐみ前廊下"){
+        }else if(mapName == "つぐみ前廊下"){//つぐみ前廊下補正
           if(location.grid.y > 500 && location.grid.y < 620){
             mapName = "つぐみトイレ";
           }
