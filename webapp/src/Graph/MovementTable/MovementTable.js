@@ -53,8 +53,8 @@ export default function MovementTable(props) {
       //const nowMap = toCountDict(locationMaps);
       const nowMap = mode(locationMaps);
       if(locationMaps){
-        if(name != nowMap){
-          if(time != term.start){
+        if(name !== nowMap){
+          if(time !== term.start){
             list.push({
               time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
               mapName: name
@@ -66,7 +66,7 @@ export default function MovementTable(props) {
           count += 60000;
         }
       }else{
-        if(name != "none"){
+        if(name !== "none"){
           list.push({
             time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
             mapName: name
@@ -80,7 +80,7 @@ export default function MovementTable(props) {
       setLocationList(list);
       recentlyTime = time + 60000;
     }
-    if(recentlyTime != term.start){
+    if(recentlyTime !== term.start){
       list.push({
         time: `${unixTime2ymd(recentlyTime - count)} ~ ${unixTime2ymd(recentlyTime)}`,
         mapName: name
@@ -101,7 +101,7 @@ export default function MovementTable(props) {
     }
     locationMaps.forEach((mapName) => {
       for(let i=0; i<maps.length; i++){
-        if(maps[i][0] == mapName){
+        if(maps[i][0] === mapName){
           maps[i][1] += 1;
           fly = true;
         }
