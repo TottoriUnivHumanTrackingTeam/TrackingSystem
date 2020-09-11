@@ -50,9 +50,8 @@ export default function MovementTable(props) {
       const locationMaps = _.map(selectLocation, location => {
         return location.map;
       });
-      //const nowMap = toCountDict(locationMaps);
-      const nowMap = mode(locationMaps);
-      if(locationMaps){
+      if(locationMaps.length >= 5){
+        const nowMap = mode(locationMaps);
         if(name !== nowMap){
           if(time !== term.start){
             list.push({
@@ -66,7 +65,9 @@ export default function MovementTable(props) {
           count += 60000;
         }
       }else{
-        if(name !== "none"){
+        if(name === "うぐいすユニット" || name === "施設外"){
+          count += 60000;
+        }else if(name !== "none"){
           list.push({
             time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
             mapName: name
@@ -96,10 +97,13 @@ export default function MovementTable(props) {
   const mode = (locationMaps) => {
     let maps = [];
     let fly = false;
-    if(locationMaps.length < 5){
-      return "none";
-    }
+    let anotherRoom = false;
+    let anotherRoomName = "";
     locationMaps.forEach((mapName) => {
+      if(mapName === "うぐいすユニット" || mapName === "施設外"){
+        anotherRoom = true;
+        anotherRoomName = mapName;
+      }
       for(let i=0; i<maps.length; i++){
         if(maps[i][0] === mapName){
           maps[i][1] += 1;
@@ -119,6 +123,9 @@ export default function MovementTable(props) {
         modeMap = maps[i][1];
         modeNum = i;
       }
+    }
+    if(anotherRoom){
+      return anotherRoomName;
     }
     return maps[modeNum][0];
   };
