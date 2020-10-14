@@ -5,7 +5,7 @@ export default function TimeSlider(props) {
   const [timeLine, setTimeLine] = useState([]);
 
   useEffect(() => {
-    setTimeLine(props.timeline.reverse());
+    setTimeLine(props.timeline);
   }, [props.timeline]);
 
   const makeTimeString = millisec => {
