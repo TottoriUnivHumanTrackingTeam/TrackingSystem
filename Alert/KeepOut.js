@@ -8,15 +8,17 @@ module.exports = class KeepOut {
   static async check(tracker) {
     const keepOutList = JSON.parse(fs.readFileSync('./keepOutMapList.json', 'utf-8'));
     const allMaps = await MapRepository.getAllMap();
-    let map1 = allMaps.find(map => map.mapID === tracker.Location.map);
-    const includedMeta = map => {
+    let map1 = allMaps.find((map) => map.mapID === tracker.Location.map);
+    const includedMeta = (map) => {
       return map.meta === map1.mName;
     };
-    const includedPlace = map => {
+    const includedPlace = (map) => {
       return map.name === map1.name;
     };
-    const includedMetaPlace = map => {
-      return map.meta === map1.mName && map.name == map1.name;
+    const includedMetaPlace = (map) => {
+      if (map1) {
+        return map.meta === map1.mName && map.name == map1.name;
+      }
     };
 
     let keepout = false;

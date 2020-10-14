@@ -16,7 +16,7 @@ module.exports = class PositionTracking {
     const allTrackers = await TrackerRepository.getAllTracker();
     const calcTimeQuery = {
       start: calcTime - 3000, //MAMORIOは6000
-      end: calcTime
+      end: calcTime,
     };
     for (let tracker of allTrackers) {
       const detectionDatas = await DetectionDataRepository.getDetectionData(
@@ -43,7 +43,7 @@ module.exports = class PositionTracking {
             detectorNumber: detectorNum,
             RSSI: aveRSSI,
             TxPower: dataGroupByDetectorNum[detectorNum][0].TxPower,
-            numOfDataForAve: sortedDetectorData.length
+            numOfDataForAve: sortedDetectorData.length,
           };
 
           fixedDetectionDatas.push(fixedDetectionData);
@@ -61,7 +61,7 @@ module.exports = class PositionTracking {
       grid: { x: 0, y: 0 },
       weight: 0,
       map: '',
-      time: date.getTime()
+      time: date.getTime(),
     };
 
     for (let detectionData of detectionDatas) {
@@ -80,7 +80,7 @@ module.exports = class PositionTracking {
 
     const lastLocation = await LocationRepository.getLocationByTime(beaconAxis.beaconID, {
       start: beaconAxis.time - 1200,
-      end: beaconAxis.time
+      end: beaconAxis.time,
     });
     if (lastLocation[0]) {
       beaconAxis.grid.x = parseInt((lastLocation[0].grid.x * 1.6 + beaconAxis.grid.x * 0.4) / 2);
@@ -98,8 +98,8 @@ module.exports = class PositionTracking {
   }
 
   static async estimationMap(grid) {
-    const isContain = map => {
-      const m = _.find(map.size, function(size) {
+    const isContain = (map) => {
+      const m = _.find(map.size, function (size) {
         return (
           grid.x > size.min.x && grid.x < size.max.x && grid.y > size.min.y && grid.y < size.max.y
         );
