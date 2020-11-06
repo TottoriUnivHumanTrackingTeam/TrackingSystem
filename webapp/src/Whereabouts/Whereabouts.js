@@ -17,7 +17,7 @@ export default function Whereabouts() {
           <Tab>プレイバック</Tab>
           <Tab>入居者所在検索</Tab>
           <Tab>スケジュール比較</Tab>
-          <Tab>入居者日別所在履歴一覧</Tab>
+          <Tab>入居者日別所在履歴</Tab>
         </TabList>
 
         <TabPanel>
