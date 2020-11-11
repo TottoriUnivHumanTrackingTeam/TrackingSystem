@@ -40,6 +40,7 @@ export default function MovementTable(props) {
 
   const makeList = useCallback(() => {
     const list = [];
+    setLocationList(list);
     let name = "none";
     let count = 0;
     let recentlyTime;

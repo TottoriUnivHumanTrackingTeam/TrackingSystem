@@ -110,7 +110,8 @@ module.exports = class TrackerRepository {
           mapName = "つぐみ廊下";
         }else if(mapName == "つぐみ部屋１０"){
           mapName = "つぐみ廊下";
-        }else if(mapName == "つぐみ中央"){//つぐみ中央補正
+        }
+        if(mapName == "つぐみ中央"){//つぐみ中央補正
           if(location.grid.x <155 && location.grid.y > 500){
             mapName = "つぐみ部屋４";
           }else if(location.grid.x > 275){
