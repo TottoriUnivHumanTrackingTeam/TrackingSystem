@@ -64,8 +64,15 @@ export default function MovementTable(props) {
         }else{
           count += 60000;
         }
+      }else if(name === "うぐいすユニット*"){
+        list.push({
+          time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
+          mapName: "うぐいすユニット*"
+        });
+        name = "うぐいすユニット";
+        count = 60000;
       }else{
-        if(name === "うぐいすユニット" || name === "施設外"){
+        if(name === "うぐいすユニット" || name === "施設外" || name === "北ホール" ){
           count += 60000;
         }else if(name !== "none"){
           list.push({
@@ -100,7 +107,7 @@ export default function MovementTable(props) {
     let anotherRoom = false;
     let anotherRoomName = "";
     locationMaps.forEach((mapName) => {
-      if(mapName === "うぐいすユニット" || mapName === "施設外"){
+      if(mapName === "うぐいすユニット" || mapName === "うぐいすユニット*" || mapName === "施設外" || mapName === "北ホール"){
         anotherRoom = true;
         anotherRoomName = mapName;
       }

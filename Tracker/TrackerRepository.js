@@ -110,8 +110,7 @@ module.exports = class TrackerRepository {
           mapName = "つぐみ廊下";
         }else if(mapName == "つぐみ部屋１０"){
           mapName = "つぐみ廊下";
-        }
-        if(mapName == "つぐみ中央"){//つぐみ中央補正
+        }else if(mapName == "つぐみ中央"){//つぐみ中央補正
           if(location.grid.x <155 && location.grid.y > 500){
             mapName = "つぐみ部屋４";
           }else if(location.grid.x > 275){
@@ -121,7 +120,7 @@ module.exports = class TrackerRepository {
           }
         }else if(mapName == "つぐみ廊下"){//つぐみ廊下補正
           if(location.alert && location.grid.y < 480){
-            mapName = "うぐいすユニット";
+            mapName = "うぐいすユニット*";
           }else if(location.grid.y > 450){
             mapName = "つぐみ部屋４";
           }
@@ -133,7 +132,9 @@ module.exports = class TrackerRepository {
           }
         }else if(mapName == "中央廊下"){
           if(location.alert && location.grid.x < 420){
-            mapName = "うぐいすユニット";
+            mapName = "うぐいすユニット*";
+          }else if(location.grid.x >= 650 && location.grid.x <= 738){
+            mapName = "北ホール";
           }
         }
         location.map = mapName;
