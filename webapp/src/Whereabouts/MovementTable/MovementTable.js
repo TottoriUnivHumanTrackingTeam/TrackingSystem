@@ -108,7 +108,7 @@ export default function MovementTable(props) {
     let anotherRoom = false;
     let anotherRoomName = "";
     locationMaps.forEach((mapName) => {
-      if(mapName === "うぐいすユニット" || mapName === "うぐいすユニット*" || mapName === "施設外" || mapName === "北ホール"){
+      if(mapName === "うぐいすユニット" || mapName === "うぐいすユニット*" || mapName === "施設外"){
         anotherRoom = true;
         anotherRoomName = mapName;
       }

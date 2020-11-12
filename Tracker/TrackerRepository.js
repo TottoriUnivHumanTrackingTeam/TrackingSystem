@@ -104,7 +104,8 @@ module.exports = class TrackerRepository {
           return map.mapID === location.map;
         });
         let mapName = map.name;
-        if(mapName == "つぐみ部屋６"){//17番の受信機による誤判定回避
+        //17番の受信機による誤判定回避
+        if(mapName == "つぐみ部屋６"){
           mapName = "つぐみ廊下";
         }else if(mapName == "つぐみ部屋７"){
           mapName = "つぐみ廊下";
@@ -136,6 +137,10 @@ module.exports = class TrackerRepository {
             mapName = "うぐいすユニット*";
           }else if(location.grid.x >= 650 && location.grid.x <= 738){
             mapName = "北ホール";
+          }
+        }else if(mapName == "利用者玄関前廊下"){
+          if(location.grid.y > 500 && location.grid.y < 600){
+            mapName = "浴場";
           }
         }
         location.map = mapName;
