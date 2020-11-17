@@ -15,7 +15,7 @@ export default function MovementGraphRender(props) {
   useEffect(() => {
     if (props.data.length) {
       const data = {
-        labels: props.data[0].location.timeLabel.reverse(),
+        labels: props.data[0].location.timeLabel,
         datasets: []
       };
       const dataset = [];
