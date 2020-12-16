@@ -4,6 +4,7 @@ require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
 const Tracker = require('./Tracker');
 const LocationRepository = require('../Location/LocationRepository');
+const FixMapLocationRepository = require("../FixMapLocation/FixMapLocationRepository");
 const MapRepository = require('../Map/MapRepository');
 
 const DBName = process.env.DB_NAME || 'tracking';
@@ -104,43 +105,17 @@ module.exports = class TrackerRepository {
           return map.mapID === location.map;
         });
         let mapName = map.name;
-        //17番の受信機による誤判定回避
-        if(mapName == "つぐみ部屋６"){
-          mapName = "つぐみ廊下";
-        }else if(mapName == "つぐみ部屋７"){
-          mapName = "つぐみ廊下";
-        }else if(mapName == "つぐみ部屋１０"){
-          mapName = "つぐみ廊下";
-        }
-        if(mapName == "つぐみ中央"){//つぐみ中央補正
-          if(location.grid.x <155 && location.grid.y > 500){
-            mapName = "つぐみ部屋４";
-          }else if(location.grid.x > 275){
-            mapName = "つぐみトイレ";
-          }else if(location.grid.x > 240 && location.grid.y > 530){
-            mapName = "つぐみトイレ";
-          }
-        }else if(mapName == "つぐみ廊下"){//つぐみ廊下補正
-          if(location.alert && location.grid.y < 480){
-            mapName = "うぐいすユニット*";
-          }else if(location.grid.y > 450){
-            mapName = "つぐみ部屋４";
-          }
-        }else if(mapName == "つぐみ前廊下"){//つぐみ前廊下補正
-          if(location.grid.y > 500 && location.grid.y < 620){
-            mapName = "つぐみトイレ";
-          }else if(location.alert && location.grid.y >= 620){
+        if(location.alert){
+          if(mapName == "つぐみ廊下"){//つぐみ廊下補正
+            if(location.grid.y < 480){
+              mapName = "うぐいすユニット";
+            }
+          }else if(mapName == "中央廊下"){
+            if(location.grid.x < 520){
+              mapName = "うぐいすユニット";
+            }
+          }else if(mapName == "入口前廊下"){
             mapName = "施設外";
-          }
-        }else if(mapName == "中央廊下"){
-          if(location.alert && location.grid.x < 420){
-            mapName = "うぐいすユニット*";
-          }else if(location.grid.x >= 650 && location.grid.x <= 738){
-            mapName = "北ホール";
-          }
-        }else if(mapName == "利用者玄関前廊下"){
-          if(location.grid.y > 500 && location.grid.y < 600){
-            mapName = "浴場";
           }
         }
         location.map = mapName;
