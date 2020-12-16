@@ -40,13 +40,14 @@ export default function MovementTable(props) {
 
   const makeList = useCallback(() => {
     const list = [];
+    const separation = 60000;
     setLocationList(list);
     let name = "none";
     let count = 0;
     let recentlyTime;
-    for (let time = term.start; time <= term.end; time += 60000) {
+    for (let time = term.start; time <= term.end; time += separation) {
       const selectLocation = _.filter(locations, location => {
-        return location.locatedTime >= time && location.locatedTime < time + 60000;
+        return location.locatedTime >= time && location.locatedTime < time + separation;
       });
       const locationMaps = _.map(selectLocation, location => {
         return location.map;
@@ -60,34 +61,34 @@ export default function MovementTable(props) {
               mapName: name
             });
           }
-          count = 60000;
+          count = separation;
           name = nowMap;
         }else{
-          count += 60000;
+          count += separation;
         }
-      }else if(name === "うぐいすユニット*"){
+      }else if(name === "うぐいすユニット"){
         list.push({
           time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
-          mapName: "うぐいすユニット*"
+          mapName: "うぐいすユニット"
         });
-        name = "うぐいすユニット";
-        count = 60000;
+        name = "うぐいすユニット*";
+        count = separation;
       }else{
-        if(name === "うぐいすユニット" || name === "施設外" || name === "北ホール" ){
-          count += 60000;
+        if(name === "うぐいすユニット*" || name === "施設外" || name === "北ホール" ){
+          count += separation;
         }else if(name !== "none"){
           list.push({
             time: `${unixTime2ymd(time - count)} ~ ${unixTime2ymd(time)}`,
             mapName: name
           });
           name = "none"
-          count = 60000;
+          count = separation;
         }else{
-          count += 60000;
+          count += separation;
         }
       }
       setLocationList(list);
-      recentlyTime = time + 60000;
+      recentlyTime = time + separation;
     }
     if(recentlyTime !== term.start){
       list.push({
