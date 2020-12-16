@@ -90,7 +90,7 @@ module.exports = class TrackerRepository {
     const tracker = await db.collection('tracker').findOne(searchQuery);
     client.close();
     if (Object.keys(times).length) {
-      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times);
+      const locations = await FixMapLocationRepository.getLocationByTime(tracker.beaconID, times);
       tracker.Location = locations;
     } else {
       const locations = await LocationRepository.getLocationRecently(tracker.beaconID);
