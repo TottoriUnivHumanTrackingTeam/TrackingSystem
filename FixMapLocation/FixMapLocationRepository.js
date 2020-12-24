@@ -9,11 +9,22 @@ const DBURL = process.env.DB_URL + DBName || "mongodb://localhost:27017/" + DBNa
 
 module.exports = class FixMapLocationRepository {
   static async addFixMapLocation(putLocation) {
+    let locations = [];
+    for(let location of putLocation){
+      const fixmaplocation = new FixMapLocation(
+        location["beaconID"],
+        location["grid"],
+        location["map"],
+        location["locatedTime"],
+        location["alert"]
+      );
+      locations.push(fixmaplocation);
+    }
     const client = await MongoClient.connect(DBURL).catch(err => {
       console.log(err);
     });
     const db = client.db(DBName);
-    const res = await db.collection("fixmaplocation").insertMany(putLocation);
+    const res = await db.collection("fixmaplocation").insertMany(locations);
     client.close();
     return res.result;
   }
