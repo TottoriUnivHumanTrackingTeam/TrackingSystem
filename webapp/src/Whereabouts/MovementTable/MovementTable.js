@@ -6,6 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import CsvCreator from 'react-csv-creator';
 
 import './MovementTable.scss';
 import TermSelector from '../TermSelector';
@@ -139,6 +140,15 @@ export default function MovementTable(props) {
     return maps[modeNum][0];
   };
 
+  //csvDownload
+  const headers = [{
+    id: 'time',
+    display: 'time'
+  }, {
+    id: 'mapName',
+    display: 'location'
+  }];
+
   useEffect(() => {
     makeList();
   }, [makeList, locations]);
@@ -184,6 +194,12 @@ export default function MovementTable(props) {
         <TermSelector className="TermSelector" onSend={setTerm} />
       </div>
       <div className="List">{locationListRender}</div>
+      <div className="Download">
+      <CsvCreator filename='Movement_Table'
+        headers={headers}
+        rows={locationList}
+        text='CSVダウンロード'/>
+      </div>
     </div>
   );
 }
