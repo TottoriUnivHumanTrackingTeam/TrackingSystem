@@ -1,9 +1,9 @@
 {
   "map": [
     {
-      "meta": "学生居室(大)",
-      "name": "3809",
-      "IDList": ["118374e91a-ec4f-4090-a7f7-dff43a40cc54"]
+      "meta": "ミーティング室",
+      "name": "ミーティング室",
+      "IDList": ["0fd80c85-f533-4ba1-92ac-1cca158ffac8"]
     },
     {
       "name": "fuga",

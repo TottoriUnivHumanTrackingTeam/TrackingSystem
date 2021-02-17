@@ -21,14 +21,17 @@ const mapSetting = function sketch(p) {
   };
 
   p.setup = function() {
-    p.createCanvas(width, height);
+    p.createCanvas(
+      `${process.env.REACT_APP_API_MAP_WIDTH}`,
+      `${process.env.REACT_APP_API_MAP_HEIGHT}`
+    );
     backImage = p.loadImage(`${process.env.REACT_APP_API_URL}/${process.env.REACT_APP_API_MAP}`);
   };
 
   p.myCustomRedrawAccordingToNewPropsHandler = function(props) {
     if (props.detectors && !detectors.length) {
       detectors = props.detectors;
-      detectors.forEach((detector) => {
+      detectors.forEach(detector => {
         detector.color = '#ff8c00';
         detector.active = false;
       });
@@ -45,7 +48,7 @@ const mapSetting = function sketch(p) {
     p.clear();
     if (backImage) p.image(backImage, 0, 0, width, height);
     if (detectors.length > 0) {
-      detectors.forEach((detector) => {
+      detectors.forEach(detector => {
         p.fill(detector.color);
         p.ellipse(detector.detectorGrid.x, detector.detectorGrid.y, radius, radius);
         if (detector.active) {
@@ -73,7 +76,7 @@ const mapSetting = function sketch(p) {
 
   p.mouseClicked = function() {
     if (detectors.length > 0 && p.mouseX < width && p.mouseY < height) {
-      detectors.forEach((detector) => {
+      detectors.forEach(detector => {
         const distance = p.dist(
           p.mouseX,
           p.mouseY,
@@ -96,8 +99,8 @@ const mapSetting = function sketch(p) {
   p.doubleClicked = function() {
     let c = false;
     if (maps.length) {
-      maps.forEach((map) => {
-        map.size.forEach((size) => {
+      maps.forEach(map => {
+        map.size.forEach(size => {
           if (
             size.max.x - p.mouseX > 0 &&
             p.mouseX - size.min.x > 0 &&
@@ -127,13 +130,13 @@ const mapSetting = function sketch(p) {
   p.mouseDragged = function() {
     let mapID;
     if (detectors.length > 0 && p.mouseX < width && p.mouseY < height) {
-      detectors.forEach((detector) => {
+      detectors.forEach(detector => {
         if (detector.active) {
           detector.detectorGrid.x = p.mouseX;
           detector.detectorGrid.y = p.mouseY;
 
-          maps.forEach((map) => {
-            map.size.forEach((size) => {
+          maps.forEach(map => {
+            map.size.forEach(size => {
               if (
                 size.max.x - p.mouseX > 0 &&
                 p.mouseX - size.min.x > 0 &&
