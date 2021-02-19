@@ -4,6 +4,7 @@ require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
 const Tracker = require('./Tracker');
 const LocationRepository = require('../Location/LocationRepository');
+const FixMapLocationRepository = require("../FixMapLocation/FixMapLocationRepository");
 const MapRepository = require('../Map/MapRepository');
 
 const DBName = process.env.DB_NAME || 'tracking';
@@ -89,7 +90,7 @@ module.exports = class TrackerRepository {
     const tracker = await db.collection('tracker').findOne(searchQuery);
     client.close();
     if (Object.keys(times).length) {
-      const locations = await LocationRepository.getLocationByTime(tracker.beaconID, times);
+      const locations = await FixMapLocationRepository.getLocationByTime(tracker.beaconID, times);
       tracker.Location = locations;
     } else {
       const locations = await LocationRepository.getLocationRecently(tracker.beaconID);
@@ -103,7 +104,21 @@ module.exports = class TrackerRepository {
         const map = allMap.find(map => {
           return map.mapID === location.map;
         });
-        location.map = map.name;
+        let mapName = map.name;
+        if(location.alert){
+          if(mapName == "つぐみ廊下"){//つぐみ廊下補正
+            if(location.grid.y < 480){
+              mapName = "うぐいすユニット";
+            }
+          }else if(mapName == "中央廊下"){
+            if(location.grid.x < 520){
+              mapName = "うぐいすユニット";
+            }
+          }else if(mapName == "入口前廊下"){
+            mapName = "施設外";
+          }
+        }
+        location.map = mapName;
       }
     }
     return tracker;

@@ -95,11 +95,11 @@ export default function ListUpTrackerByMap(props) {
   const makeNameList = (trackers, staffOnly = false) => {
     if (staffOnly) {
       trackers = trackers.filter(tracker => {
-        return tracker.status === 'staff';
+        return tracker.status === '職員'; //Fix：職員からstaffに変更したい(trackerのstatusも変更)
       });
     } else {
       trackers = trackers.filter(tracker => {
-        return tracker.status === 'tenant';
+        return tracker.status === '入居者'; //Fix：入居者からtenantに変更したい(同上)
       });
     }
     if (trackers.length) {
