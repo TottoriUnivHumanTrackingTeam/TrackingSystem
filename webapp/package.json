@@ -19,7 +19,7 @@
     "babel-preset-react-app": "^9.1.0",
     "camelcase": "^5.2.0",
     "case-sensitive-paths-webpack-plugin": "2.2.0",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "css-loader": "2.1.1",
     "date-fns": "^2.8.1",
     "dayjs": "^1.8.17",
