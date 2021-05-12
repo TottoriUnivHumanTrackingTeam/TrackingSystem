@@ -20,7 +20,7 @@
     "mongo-express": "^0.54.0",
     "mongodb": "^3.4.0",
     "node-fetch": "^2.6.1",
-    "nodemailer": "^4.6.8",
+    "nodemailer": "^6.4.16",
     "nodemon": "^1.19.4",
     "path": "^0.12.7",
     "underscore": "^1.9.0",
