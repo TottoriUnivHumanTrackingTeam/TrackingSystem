@@ -7,6 +7,7 @@ import Playback from './Playback/Playback';
 import ListUpTrackerByMap from './ListUpTrackerByMap/ListUpTrackerByMap';
 import CompareSchedule from './CompareSchedule/CompareSchedule';
 import MovementTable from './MovementTable/MovementTable';
+import LostList from './LostList/LostList';
 
 export default function Whereabouts() {
   return (
@@ -18,6 +19,7 @@ export default function Whereabouts() {
           <Tab>入居者所在検索</Tab>
           <Tab>スケジュール比較</Tab>
           <Tab>行動履歴一覧</Tab>
+          <Tab>ロスト一覧</Tab>
         </TabList>
 
         <TabPanel>
@@ -34,6 +36,9 @@ export default function Whereabouts() {
         </TabPanel>
         <TabPanel>
           <MovementTable />
+        </TabPanel>
+        <TabPanel>
+          <LostList />
         </TabPanel>
       </Tabs>
     </div>
